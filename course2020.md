@@ -10,7 +10,7 @@ Cコンパイラを作成するオンラインのコースを試験的に始め�
 
 ## 参加方法
 
-[サインアップフォーム](https://docs.google.com/forms/d/e/1FAIpQLSf3_26eZNJXNOvRgn4bMg9_onZeRsVzurzWo-mrf5dRdMbuHg/viewform?usp=sf_link)からサインアップしてください。参加要件や参加費などは特に必要ありません。また、サインアップする必要もありませんが、サインアップしたひとには僕が作業中の最新のCコンパイラリポジトリへのアクセス権を付与します（そのリポジトリは最終的に公開するつもりですが、現時点ではforce pushで書き換えているので公開したくない）。
+[サインアップフォーム](https://docs.google.com/forms/d/e/1FAIpQLSf3_26eZNJXNOvRgn4bMg9_onZeRsVzurzWo-mrf5dRdMbuHg/viewform?usp=sf_link)からサインアップしてください。参加要件や参加費などは特に必要ありません。また、聴講生のような感じで参加する限り特にサインアップする必要もありませんが、サインアップしたひとには僕が作業中の最新のCコンパイラリポジトリへのアクセス権を付与します（そのリポジトリは最終的に公開するつもりですが、現時点ではforce pushで書き換えているので公開したくない）。
 
 ## 期間
 

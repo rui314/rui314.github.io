@@ -1,0 +1,469 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<STYLE>
+.body {
+  max-width: 600px;
+  margin: 3em auto 3em;
+  line-height: 1.4em;
+  font-family: arial;
+}
+</STYLE>
+<HTML><HEAD><TITLE>Man page of MOLD</TITLE>
+</HEAD><BODY>
+<H1>MOLD</H1>
+Section: User Commands  (1)<BR><A HREF="#index">Index</A>
+<A HREF="/cgi-bin/man/man2html">Return to Main Contents</A><HR>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+mold - A Modern Linker
+<P>
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+mold [<B>options</B>] <I>objfile</I> <B>...</B>
+<P>
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<B>mold</B> is a multi-threaded, high-performance linker that is
+several times faster than the industry-standard ones, namely, GNU ld,
+GNU gold or LLVM lld. It is developed as a drop-in replacement for
+these linkers and command-line compatible with them with a few
+exceptions.
+<P>
+
+Note that even though <B>mold</B> can build many userland programs,
+including large ones such as Chrome and Firefox, it is still very
+experimental. Do not use <B>mold</B> for production unless you know
+what you are doing. <B>mold</B> supports Linux/x86-64 and Linux/i386.
+<P>
+<A NAME="lbAE">&nbsp;</A>
+<H3>How to use mold</H3>
+
+On Unix, <B>cc</B> (or <B>gcc</B> or <B>clang</B>, depending on what
+compiler you use) is not just a C compiler but is actually a compiler
+driver for various kinds of input files. <B>cc</B> dispatches based
+on input file extensions. If you pass object files (<B>.o</B> files) to
+a compiler driver, the linker command, which is usually installed as
+<B>/usr/bin/ld</B>, is invoked as a backend.
+<P>
+
+To use an alternative linker, you have to modify a build config file
+such as <B>Makefile</B> or <B>cargo.toml</B> to pass an appropriate
+option to a compiler driver which invokes a linker. The problem is
+that it is not always clear how to do that. In a complicated build
+system, it can be very hard to figure out how to convince a system to
+use a non-standard linker.
+<P>
+
+To deal with the situation, <B>mold</B> provides a convenient option to
+force any build system to use <B>mold</B>. To use the feature, invoke
+<B>make</B> or a build command of your choice (such as <B>cargo
+build</B>) as follows:
+<P>
+
+
+        mold -run make &lt;make arguments if any&gt;
+
+<P>
+
+If you run a build command like above, the command runs under the
+influence of <B>mold</B> so that when the command tries to run
+<B>/usr/bin/ld</B>, <B>mold</B> is silently invoked instead.
+<P>
+
+Internally, <B>mold</B> invokes a given command with the
+<B>LD_PRELOAD</B> environment variable set to its companion shared
+object file. The shared object file intercepts all <B>exec()</B>-family
+functions to run <B>mold</B> if <B>/usr/bin/ld</B> is attempted to be
+run.
+<P>
+
+If you don't want to use the <B>-run</B> option, and if you are using
+<B>clang</B>, you can pass <B>-fuse-ld</B>=<I>/absolute/path/to/mold</I> to
+<B>clang</B> to used <B>mold</B>. If you are using <B>gcc</B>, it looks
+like there's unfortunately no easy way (other than <B>-run</B>) to
+force it to use <B>mold</B>, as <B>gcc</B> doesn't take an arbitrary
+pathname as an argument for <B>-fuse-ld</B>.
+<P>
+
+I do not recommend installing <B>mold</B> as <B>/usr/bin/ld</B>
+unless you know what you are doing.
+<P>
+<A NAME="lbAF">&nbsp;</A>
+<H3>Compatibility</H3>
+
+<B>mold</B> is designed to be a drop-in replacement for the GNU linkers
+for linking user-land programs. If your user-land program cannot be
+built due to missing command-line options, please file a bug at
+<B><A HREF="https://github.com/rui314/mold/issues">https://github.com/rui314/mold/issues</A></B>.
+<P>
+
+<B>mold</B> supports a very limited set of linker script features,
+which is just sufficient to read
+<B>/usr/lib/x86_64-linux-gnu/libc.so</B> on Linux systems (on Linux,
+that file is despite its name not a shared library but an ASCII linker
+script that loads a real <B>libc.so</B> file!)
+Beyond that, I have no plan to support any linker script features.
+The linker script is an ad-hoc, over-designed, complex language which
+I believe needs to be disrupted by a simpler mechanism. I have a plan
+to add a replacement for the linker script to <B>mold</B> instead.
+<P>
+<A NAME="lbAG">&nbsp;</A>
+<H3>Archive symbol resolution</H3>
+
+Traditionally, Unix linkers are sensitive to the order in which input
+files appear on command line. They process input files from the first
+(leftmost) file to the last (rightmost) file one by one. While reading
+input files, they maintain sets of defined and undefined symbols.
+When visiting an archive file (<B>.a</B> files), they pull out object
+files to resolve as many undefined symbols as possible and go on to
+the next input file. Object files that weren't pulled out will never
+have a chance for a second look.
+<P>
+
+Due to this semantics, you usually have to add archive files at the end
+of a command line, so that when a linker reaches archive files, it
+knows what symbols are remain undefined. If you put archive files at
+the beginning of a command line, a linker doesn't have any undefined
+symbol, and thus no object files will be pulled out from archives.
+<P>
+
+You can change the processing order by <B>--start-group</B> and
+<B>--end-group</B> options, though they make a linker slower.
+<P>
+
+<B>mold</B> as well as LLVM <B>lld</B> linker take a different
+approach. They memorize what symbols can be resolved from archive
+files instead of forgetting it after processing each
+archive. Therefore, <B>mold</B> and <B>lld</B> can &quot;go back&quot; in a
+command line to pull out object files from archives, if they are
+needed to resolve remaining undefined symbols. They are not sensitive
+to the input file order.
+<P>
+
+<B>--start-group</B> and <B>--end-group</B> are still accepted
+by <B>mold</B> and <B>lld</B> for compatibility with traditional linkers,
+but they are silently ignored.
+<P>
+<A NAME="lbAH">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<DL COMPACT>
+<DT><B>--help</B><DD>
+Report usage information
+<DT><B>-v</B><DD>
+
+<DT><B>--version</B><DD>
+
+Report version information
+<DT><B>-V</B><DD>
+Report version and target information
+<DT><B>-C</B> <I>dir</I><DD>
+
+<DT><B>--directory</B> <I>dir</I><DD>
+
+Change to <I>dir</I> before doing anything
+<DT><B>-E</B><DD>
+
+<DT><B>--export-dynamic</B><DD>
+
+Put symbols in the dynamic symbol table
+<DT><B>--no-export-dynamic</B><DD>
+Do not put symbols in the dynamic symbol table
+<DT><B>-F</B> <I>libname</I><DD>
+
+<DT><B>--filter</B>=<I>libname</I><DD>
+
+Set <B>DT_FILTER</B> to <I>libname</I>
+<DT><B>-I</B><I>file</I><DD>
+
+<DT><B>--dynamic-linker</B>=<I>file</I><DD>
+
+Set dynamic linker path
+<DT><B>--no-dynamic-linker</B><DD>
+Do not set dynamic linker path
+<DT><B>-L</B><I>dir</I><DD>
+
+<DT><B>--library-path</B>=<I>dir</I><DD>
+
+Add <I>dir</I> to library search path
+<DT><B>-M</B><DD>
+
+<DT><B>--print-map</B><DD>
+
+Write map file to stdout
+<DT><B>-N</B><DD>
+
+<DT><B>--omagic</B><DD>
+
+Do not page align data, do not make text readonly
+<DT><B>--no-omagic</B><DD>
+Page align data, make text readonly
+<DT><B>-S</B><DD>
+
+<DT><B>--strip-debug</B><DD>
+
+Strip <B>.debug_*</B> sections
+<DT><B>-T</B> <I>file</I><DD>
+
+<DT><B>--script</B>=<I>file</I><DD>
+
+Read linker script from <I>file</I>
+<DT><B>-X</B><DD>
+
+<DT><B>--discard-locals</B><DD>
+
+Discard temporary local symbols
+<DT><B>-e</B><I>symbol</I><DD>
+
+<DT><B>--entry</B>=<I>symbol</I><DD>
+
+Set program entry point
+<DT><B>-f</B> <I>shlib</I><DD>
+
+<DT><B>--auxiliary</B>=<I>shlib</I><DD>
+
+Set <B>DT_AUXILIARY</B> to <I>shlib</I>
+<DT><B>-h</B> <I>libname</I><DD>
+
+<DT><B>--soname</B><I>libname</I><DD>
+
+Set shared library name
+<DT><B>-l</B><I>libname</I><DD>
+Search for <I>libname</I>
+<DT><B>-o</B> <I>file</I><DD>
+
+<DT><B>--output</B>=<I>file</I><DD>
+
+Set output filename
+<DT><B>-s</B><DD>
+
+<DT><B>--strip-all</B><DD>
+
+Strip .symtab section
+<DT><B>-u</B> <I>symbol</I><DD>
+
+<DT><B>--undefined</B>=<I>symbol</I><DD>
+
+Force to resolve <I>symbol</I>
+<DT><B>--Bdynamic</B><DD>
+Link against shared libraries (default)
+<DT><B>--Bstatic</B><DD>
+Do not link against shared libraries
+<DT><B>--Bsymbolic</B><DD>
+Bind global symbols locally
+<DT><B>--Bsymbolic-functions</B><DD>
+Bind global functions locally
+<DT><B>--Map</B>=<I>file</I><DD>
+Write map file to a given file
+<DT><B>--as-needed</B><DD>
+Only set <B>DT_NEEDED</B> if used
+<DT><B>--no-as-needed</B><DD>
+Always set <B>DT_NEEDED</B>
+<DT><B>--build-id</B>=[<I>none</I>,<I>md5</I>,<I>sha1</I>,<I>sha256</I>,<I>uuid</I>,<I>hexstring</I>]<DD>
+Generate build ID
+<DT><B>--no-build-id</B><DD>
+Do not generate build ID
+<DT><B>--chroot</B>=<I>dir</I><DD>
+Set <I>dir</I> to root directory
+<DT><B>--compress-debug-sections</B>=[<I>none</I>,<I>zlib</I>,<I>zlib-gabi</I>]<DD>
+Compress <B>.debug_*</B> sections
+<DT><B>--demangle</B><DD>
+Demangle C++ symbols in log messages (default)
+<DT><B>--no-demangle</B><DD>
+Do not demangle
+<DT><B>--dynamic-list</B><DD>
+Read a list of dynamic symbols
+<DT><B>--eh-frame-hdr</B><DD>
+Create <B>.eh_frame_hdr</B> section
+<DT><B>--no-eh-frame-hdr</B><DD>
+Do not create <B>.eh_frame_hdr</B> section (default)
+<DT><B>--exclude-libs</B>=<I>lib,lib,..</I><DD>
+Mark all symbols in given libraries hidden
+<DT><B>--fini</B>=<I>symbol</I><DD>
+Call <I>symbol</I> at unload-time
+<DT><B>--fork</B><DD>
+Spawn a child process (default)
+<DT><B>--no-fork</B><DD>
+Do not spawn a child process
+<DT><B>--gc-sections</B><DD>
+Remove unreferenced sections
+<DT><B>--no-gc-sections</B><DD>
+Do not remove unreferenced sections
+<DT><B>--hash-style</B>=[<I>sysv</I>,<I>gnu</I>,<I>both</I>]<DD>
+Set hash style
+<DT><B>--icf</B><DD>
+Fold identical code
+<DT><B>--no-icf</B><DD>
+Do not fold identical code
+<DT><B>--init</B>=<I>symbol</I><DD>
+Call <I>symbol</I> at load-time
+<DT><B>--no-undefined</B><DD>
+Report undefined symbols (even with <B>--shared</B>)
+<DT><B>--perf</B><DD>
+Print performance statistics
+<DT><B>--pie</B><DD>
+
+<DT><B>--pic-executable</B><DD>
+
+Create a position independent executable
+<DT><B>--no-pie</B><DD>
+
+<DT><B>--no-pic-executable</B><DD>
+
+Do not create a position independent executable
+<DT><B>--pop-state</B><DD>
+Pop state of flags governing input file handling
+<DT><B>--preload</B><DD>
+Preload object files
+<DT><B> --print-gc-sections</B><DD>
+Print removed unreferenced sections
+<DT><B>--no-print-gc-sections</B><DD>
+Do not print removed unreferenced sections (default)
+<DT><B>--print-icf-sections</B><DD>
+Print folded identical sections
+<DT><B>--no-print-icf-sections</B><DD>
+Do not print folded identical sections
+<DT><B>--push-state</B><DD>
+Pop state of flags governing input file handling
+<DT><B>--quick-exit</B><DD>
+Use quick_exit to exit (default)
+<DT><B>--no-quick-exit</B><DD>
+Do not use quick_exit to exit
+<DT><B>--relax</B><DD>
+Optimize instructions (default)
+<DT><B>--no-relax</B><DD>
+Do not optimize instructions
+<DT><B>--repro</B><DD>
+Embed input files to .repro section
+<DT><B>--rpath</B>=<I>dir</I><DD>
+Add <I>dir</I> to runtime search path
+<DT><B>--run</B> <I>command arg ...</I><DD>
+Run <I>command</I> with mold as <B>/usr/bin/ld</B>
+<DT><B>--shared</B><DD>
+
+<DT><B>--Bshareable</B><DD>
+
+Create a share library
+<DT><B>--spare-dynamic-tags</B>=<I>number</I><DD>
+Reserve give number of tags in .dynamic section
+<DT><B>--static</B><DD>
+Do not link against shared libraries
+<DT><B>--stats</B><DD>
+Print input statistics
+<DT><B>--sysroot</B>=<I>dir</I><DD>
+Set target system root directory
+<DT><B>--thread-count=</B><I>count</I><DD>
+Use <I>count</I> number of threads
+<DT><B>--threads</B><DD>
+Use multiple threads (default)
+<DT><B>--no-threads</B><DD>
+Do not use multiple threads
+<DT><B>--trace</B><DD>
+Print name of each input file
+<DT><B>--version-script</B>=<I>file</I><DD>
+Read version script
+<DT><B>--warn-common</B><DD>
+Warn about common symbols
+<DT><B>--no-warn-common</B><DD>
+Do not warn about common symbols
+<DT><B>--whole-archive</B><DD>
+Include all objects from static archives
+<DT><B>--no-whole-archive</B><DD>
+Do not include all objects from static archives
+<DT><B>-z now</B><DD>
+Disable lazy function resolution
+<DT><B>-z lazy</B><DD>
+Enable lazy function resolution (default)
+<DT><B>-z execstack</B><DD>
+Require executable stack
+<DT><B>-z noexecstack</B><DD>
+Do not require executable stack (default)
+<DT><B>-z relro</B><DD>
+Make some sections read-only after relocation (default)
+<DT><B>-z norelro</B><DD>
+Do not use relro
+<DT><B>-z defs</B><DD>
+Report undefined symbols (even with <I>--shared</I>)
+<DT><B>-z nodefs</B><DD>
+Do not report undefined symbols
+<DT><B>-z nodlopen</B><DD>
+Mark DSO not available to dlopen
+<DT><B>-z nodelete</B><DD>
+Mark DSO non-deletable at runtime
+<DT><B>-z nocopyreloc</B><DD>
+Do not create copy relocations
+<DT><B>-z initfirst</B><DD>
+Mark DSO to be initialized first at runtime
+<DT><B>-z interpose</B><DD>
+Mark object to interpose all DSOs but executable
+<P>
+<DT><B>-(</B><DD>
+
+<DT><B>-)</B><DD>
+<DT><B>-O</B><I>number</I><DD>
+<DT><B>-m</B> <I>emulation</I><DD>
+<DT><B>--allow-multiple-definition</B><DD>
+<DT><B>--color-diagnostics</B><DD>
+<DT><B>--disable-new-dtags</B><DD>
+<DT><B>--enable-new-dtags</B><DD>
+<DT><B>--end-group</B><DD>
+<DT><B>--fatal-warnings</B><DD>
+<DT><B>--gdb-index</B><DD>
+<DT><B>--no-fatal-warnings</B><DD>
+<DT><B>--plugin-opt</B><DD>
+<DT><B>--plugin</B><DD>
+<DT><B>--rpath-link</B>=<I>dir</I><DD>
+<DT><B>--sort-common</B><DD>
+<DT><B>--sort-section</B><DD>
+<DT><B>--start-group</B><DD>
+
+Ignored
+<P>
+</DL>
+<A NAME="lbAI">&nbsp;</A>
+<H2>BUGS</H2>
+
+Report bugs at <B><A HREF="https://github.com/rui314/mold/issues">https://github.com/rui314/mold/issues</A></B>.
+<P>
+<A NAME="lbAJ">&nbsp;</A>
+<H2>AUTHOR</H2>
+
+Rui Ueyama &lt;<B><A HREF="mailto:ruiu@cs.stanford.edu">ruiu@cs.stanford.edu</A></B>&gt;
+<P>
+<A NAME="lbAK">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<B><A HREF="/cgi-bin/man/man2html?1+ld">ld</A></B>(1),
+
+<B><A HREF="/cgi-bin/man/man2html?1+gold">gold</A></B>(1),
+
+<B><A HREF="/cgi-bin/man/man2html?8+ld.so">ld.so</A></B>(8)
+
+<P>
+
+<HR>
+<A NAME="index">&nbsp;</A><H2>Index</H2>
+<DL>
+<DT><A HREF="#lbAB">NAME</A><DD>
+<DT><A HREF="#lbAC">SYNOPSIS</A><DD>
+<DT><A HREF="#lbAD">DESCRIPTION</A><DD>
+<DL>
+<DT><A HREF="#lbAE">How to use mold</A><DD>
+<DT><A HREF="#lbAF">Compatibility</A><DD>
+<DT><A HREF="#lbAG">Archive symbol resolution</A><DD>
+</DL>
+<DT><A HREF="#lbAH">OPTIONS</A><DD>
+<DT><A HREF="#lbAI">BUGS</A><DD>
+<DT><A HREF="#lbAJ">AUTHOR</A><DD>
+<DT><A HREF="#lbAK">SEE ALSO</A><DD>
+</DL>
+<HR>
+This document was created by
+<A HREF="/cgi-bin/man/man2html">man2html</A>,
+using the manual pages.<BR>
+Time: 11:35:33 GMT, May 18, 2021
+</BODY>
+</HTML>

@@ -15,7 +15,9 @@ html {		max-width: 65em;
 		--fg: #000000; }
 body {		background: var(--bg);
 		color: var(--fg);
-		font-family: Helvetica,Arial,sans-serif; }
+                max-width: 800px;
+                margin: 50px auto;
+		font-family: Arial,sans-serif; }
 h1 {		font-size: 110%; }
 table {		margin-top: 0em;
 		margin-bottom: 0em;
@@ -194,6 +196,7 @@ code.Nm {	font-style: normal;
 		font-weight: bold;
 		font-family: inherit; }
 .Ar {		font-style: italic;
+                text-decoration: none;
 		font-weight: normal; }
 .Op {		display: inline; }
 .Ic {		font-style: normal;

@@ -35,8 +35,7 @@ ul, ol, dl {	margin-top: 0em;
 li, dt {	margin-top: 1em; }
 pre {		font-family: inherit; }
 
-.permalink {	border-bottom: thin dotted;
-		color: inherit;
+.permalink {	color: inherit;
 		font: inherit;
 		text-decoration: inherit; }
 * {		clear: both }
@@ -265,7 +264,7 @@ a.In { }
 		font-family: monospace; }
 
 /* Tooltip support. */
-
+/*
 h1.Sh, h2.Ss {	position: relative; }
 .An, .Ar, .Cd, .Cm, .Dv, .Em, .Er, .Ev, .Fa, .Fd, .Fl, .Fn, .Ft,
 .Ic, code.In, .Lb, .Lk, .Ms, .Mt, .Nd, code.Nm, .Pa, .Rs,
@@ -337,6 +336,7 @@ h1.Sh::before, h2.Ss::before, .St::before, .Sx::before, .Sy::before,
 .Xr:hover::before {
 		opacity: 1;
 		pointer-events: inherit; }
+*/
 
 /* Overrides to avoid excessive margins on small devices. */
 

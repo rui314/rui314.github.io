@@ -34,18 +34,7 @@
  -->
 <head>
   <meta charset="utf-8"/>
-  <style>
-    table.head, table.foot { width: 100%; }
-    td.head-rtitle, td.foot-os { text-align: right; }
-    td.head-vol { text-align: center; }
-    div.Pp { margin: 1ex 0ex; }
-    div.Nd, div.Bf, div.Op { display: inline; }
-    span.Pa, span.Ad { font-style: italic; }
-    span.Ms { font-weight: bold; }
-    dl.Bl-diag > dt { font-weight: bold; }
-    code.Nm, code.Fl, code.Cm, code.Ic, code.In, code.Fd, code.Fn,
-    code.Cd { font-weight: bold; font-family: inherit; }
-  </style>
+  <link rel="stylesheet" href="mandoc.css" type="text/css" media="all"/>
   <title>MOLD(1)</title>
 </head>
 <body>
@@ -199,18 +188,28 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
   arguments.
 <h1 class="Sh" title="Sh" id="OPTIONS"><a class="permalink" href="#OPTIONS">OPTIONS</a></h1>
 <dl class="Bl-tag">
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-help"><code class="Fl" title="Fl" id="-help">--help</code></a></dt>
   <dd>Report usage information to stdout and exit.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#v"><code class="Fl" title="Fl" id="v">-v</code></a>,
     <code class="Fl" title="Fl">--version</code></dt>
   <dd>Report version information to stdout.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#V"><code class="Fl" title="Fl" id="V">-V</code></a></dt>
   <dd>Report version and target information to stdout.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#C"><code class="Fl" title="Fl" id="C">-C</code></a>
     <var class="Ar" title="Ar">dir</var>,
     <code class="Fl" title="Fl">--directory</code>
     <var class="Ar" title="Ar">dir</var></dt>
   <dd>Change to <var class="Ar" title="Ar">dir</var> before doing anything.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#E"><code class="Fl" title="Fl" id="E">-E</code></a>,
     <code class="Fl" title="Fl">--export-dynamic</code>,
     <code class="Fl" title="Fl">--no-export-dynamic</code></dt>
@@ -222,11 +221,15 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
     By default, or if <code class="Fl" title="Fl">--no-export-dynamic</code> is
       given, only symbols that are referenced by DSOs at link-time are exported
       from an executable.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#F"><code class="Fl" title="Fl" id="F">-F</code></a>
     <var class="Ar" title="Ar">libname</var>,
     <code class="Fl" title="Fl">--filter</code>=<var class="Ar" title="Ar">libname</var></dt>
   <dd>Set the <code class="Dv" title="Dv">DT_FILTER</code> dynamic section field
       to <var class="Ar" title="Ar">libname</var>.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#I"><code class="Fl" title="Fl" id="I">-I</code></a><var class="Ar" title="Ar">file</var>,
     <code class="Fl" title="Fl">--dynamic-linker</code>=<var class="Ar" title="Ar">file</var>,
     <code class="Fl" title="Fl">--no-dynamic-linker</code></dt>
@@ -238,6 +241,8 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
       this difference doesn't usually make any difference because the compiler
       driver always passes <code class="Fl" title="Fl">-I</code> to a
     linker.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#L"><code class="Fl" title="Fl" id="L">-L</code></a><var class="Ar" title="Ar">dir</var>,
     <code class="Fl" title="Fl">--library-path</code>=<var class="Ar" title="Ar">dir</var></dt>
   <dd>Add <var class="Ar" title="Ar">dir</var> to the list of library search
@@ -248,9 +253,13 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
       have the default search paths. This difference doesn't usually make any
       difference because the compiler driver always passes all necessary search
       paths to a linker.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#M"><code class="Fl" title="Fl" id="M">-M</code></a>,
     <code class="Fl" title="Fl">--print-map</code></dt>
   <dd>Write a map file to stdout.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#N"><code class="Fl" title="Fl" id="N">-N</code></a>,
     <code class="Fl" title="Fl">--omagic</code>,
     <code class="Fl" title="Fl">--no-omagic</code></dt>
@@ -258,14 +267,20 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
       an old-fashioned memory layout. First, it makes the first data segment to
       not be aligned to a page boundary. Second, text segments are marked as
       writable if the option is given.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#S"><code class="Fl" title="Fl" id="S">-S</code></a>,
     <code class="Fl" title="Fl">--strip-debug</code></dt>
   <dd>Omit <b class="Sy" title="Sy">.debug_*</b> sections from the output
     file.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#T"><code class="Fl" title="Fl" id="T">-T</code></a>
     <var class="Ar" title="Ar">file</var>,
     <code class="Fl" title="Fl">--script</code>=<var class="Ar" title="Ar">file</var></dt>
   <dd>Read linker script from <var class="Ar" title="Ar">file</var>.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#X"><code class="Fl" title="Fl" id="X">-X</code></a>,
     <code class="Fl" title="Fl">--discard-locals</code></dt>
   <dd>Discard temporary local symbols to reduce the sizes of the symbol table
@@ -273,17 +288,23 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
       with <code class="Li">.L</code>. Compilers usually generate such symbols
       for unnamed program elements such as string literals or floating-point
       literals.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#e"><code class="Fl" title="Fl" id="e">-e</code></a>
     <var class="Ar" title="Ar">symbol</var>,
     <code class="Fl" title="Fl">--entry</code>=<var class="Ar" title="Ar">symbol</var></dt>
   <dd>Use <var class="Ar" title="Ar">symbol</var> as the entry point symbol
       instead of the default entry point symbol
       <b class="Sy" title="Sy">_start</b>.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#f"><code class="Fl" title="Fl" id="f">-f</code></a>
     <var class="Ar" title="Ar">shlib</var>,
     <code class="Fl" title="Fl">--auxiliary</code>=<var class="Ar" title="Ar">shlib</var></dt>
   <dd>Set the <code class="Dv" title="Dv">DT_AUXILIARY</code> dynamic section
       field to <var class="Ar" title="Ar">shlib</var>.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#h"><code class="Fl" title="Fl" id="h">-h</code></a>
     <var class="Ar" title="Ar">libname</var>,
     <code class="Fl" title="Fl">--soname</code><var class="Ar" title="Ar">libname</var></dt>
@@ -294,31 +315,43 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
       want to pass
       <code class="Fl" title="Fl">--soname</code>=<var class="Ar" title="Ar">foo</var>
       to a linker.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#l"><code class="Fl" title="Fl" id="l">-l</code></a><var class="Ar" title="Ar">libname</var></dt>
   <dd>Search for Sylib
       <var class="Ar" title="Ar">libname</var><b class="Sy" title="Sy">.so</b>
       or Sylib
       <var class="Ar" title="Ar">libname</var><b class="Sy" title="Sy">.a</b>
       from library search paths.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#m"><code class="Fl" title="Fl" id="m">-m</code></a>
     [<div class="Op"><b class="Sy" title="Sy">elf_x86_64</b> |
     <b class="Sy" title="Sy">elf_i386</b></div>]</dt>
   <dd>Choose a target.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#o"><code class="Fl" title="Fl" id="o">-o</code></a>
     <var class="Ar" title="Ar">file</var>,
     <code class="Fl" title="Fl">--output</code>=<var class="Ar" title="Ar">file</var></dt>
   <dd>Use <var class="Ar" title="Ar">file</var> as the output file name instead
       of the default name <b class="Sy" title="Sy">a.out</b>.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#r"><code class="Fl" title="Fl" id="r">-r</code></a>,
     <code class="Fl" title="Fl">--relocatable</code></dt>
   <dd>Instead of generating an executable or a shared object file, combine input
       object files to generate another object file that can be used as an input
       to a linker.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#s"><code class="Fl" title="Fl" id="s">-s</code></a>,
     <code class="Fl" title="Fl">-FL</code>
     <code class="Fl" title="Fl">--strip-all</code></dt>
   <dd>Omit <code class="Dv" title="Dv">.symtab</code> section from the output
       file.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#u"><code class="Fl" title="Fl" id="u">-u</code></a>
     <var class="Ar" title="Ar">symbol</var>,
     <code class="Fl" title="Fl">--undefined</code>=<var class="Ar" title="Ar">symbol</var></dt>
@@ -327,10 +360,16 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
       contains an object file defining <var class="Ar" title="Ar">symbol</var>,
       pull out the object file and link it so that the output file contains a
       definition of <var class="Ar" title="Ar">symbol</var>.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-Bdynamic"><code class="Fl" title="Fl" id="-Bdynamic">--Bdynamic</code></a></dt>
   <dd>Link against shared libraries.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-Bstatic"><code class="Fl" title="Fl" id="-Bstatic">--Bstatic</code></a></dt>
   <dd>Do not link against shared libraries.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-Bsymbolic"><code class="Fl" title="Fl" id="-Bsymbolic">--Bsymbolic</code></a></dt>
   <dd>When creating a shared library, make global symbols export-only (i.e. do
       not import the same symbol). As a result, references within a shared
@@ -338,20 +377,30 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
       See <a class="Sx" title="Sx" href="#Dynamic_symbol_resolution">Dynamic
       symbol resolution</a> for more information about symbol imports and
       exports.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-Bsymbolic-functions"><code class="Fl" title="Fl" id="-Bsymbolic-functions">--Bsymbolic-functions</code></a></dt>
   <dd>Have the same effect as <code class="Fl" title="Fl">--Bsymbolic</code> but
       works only for function symbols. Data symbols remains both imported and
       exported.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-Bno-symbolic"><code class="Fl" title="Fl" id="-Bno-symbolic">--Bno-symbolic</code></a></dt>
   <dd>Cancel <code class="Fl" title="Fl">--Bsymbolic</code> and
       <code class="Fl" title="Fl">--Bsymbolic-functions</code>.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-Map"><code class="Fl" title="Fl" id="-Map">--Map</code></a>=<var class="Ar" title="Ar">file</var></dt>
   <dd>Write map file to <var class="Ar" title="Ar">file</var>.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-allow-multiple-definition"><code class="Fl" title="Fl" id="-allow-multiple-definition">--allow-multiple-definition</code></a></dt>
   <dd>Normally, the linker reports an error if there are more than one
       definition of a symbol. This option changes the default behavior so that
       it doesn't report an error for duplicate definitions and instead use the
       first definition.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-as-needed"><code class="Fl" title="Fl" id="-as-needed">--as-needed</code></a>,
     <code class="Fl" title="Fl">--no-as-needed</code></dt>
   <dd>By default, shared libraries given to a linker are unconditionally added
@@ -364,6 +413,8 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
     <div class="Pp"></div>
     The <code class="Fl" title="Fl">--no-as-needed</code> option restores the
       default behavior for subsequent files.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-build-id"><code class="Fl" title="Fl" id="-build-id">--build-id</code></a>,
     <code class="Fl" title="Fl">--no-build-id</code>,
     <code class="Fl" title="Fl">--build-id</code>=[<div class="Op"><b class="Sy" title="Sy">none</b>
@@ -381,11 +432,17 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
       <b class="Sy" title="Sy">uuid</b> sets a random 128-bit UUID.
       <b class="Sy" title="Sy">0x</b><var class="Ar" title="Ar">hexstring</var>
       sets <var class="Ar" title="Ar">hexstring</var>.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-chroot"><code class="Fl" title="Fl" id="-chroot">--chroot</code></a>=<var class="Ar" title="Ar">dir</var></dt>
   <dd>Set <var class="Ar" title="Ar">dir</var> to root directory.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-compress-debug-sections_fR=__fInone_fR,_fIzlib_fR,_fIzlib-gabi_fR,_fIzlib-gnu_fR__"><code class="Fl" title="Fl" id="-compress-debug-sections_fR=__fInone_fR,_fIzlib_fR,_fIzlib-gabi_fR,_fIzlib-gnu_fR__">--compress-debug-sections=[<i>none</i>,<i>zlib</i>,<i>zlib-gabi</i>,<i>zlib-gnu</i>]&quot;</code></a></dt>
   <dd>Compress DWARF debug info (<b class="Sy" title="Sy">.debug_*</b> sections)
       using the zlib compression algorithm.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-defsym__Ns"><code class="Fl" title="Fl" id="-defsym__Ns">--defsym&#x00A0;Ns</code></a>
     <code class="Fl" title="Fl">-=</code><var class="Ar" title="Ar">symbol</var>=<var class="Ar" title="Ar">value</var></dt>
   <dd>Define <var class="Ar" title="Ar">symbol</var> as an alias for
@@ -395,75 +452,123 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
       hexadecimal with &#x2018;0x&#x2019; prefix) or a symbol name. If an
       integer is given as a value, <var class="Ar" title="Ar">symbol</var> is
       defined as an absolute symbol with the given value.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-demangle"><code class="Fl" title="Fl" id="-demangle">--demangle</code></a>,
     <code class="Fl" title="Fl">--no-demangle</code></dt>
   <dd>Demangle C++ symbols in log messages.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-dynamic-list"><code class="Fl" title="Fl" id="-dynamic-list">--dynamic-list</code></a>=<var class="Ar" title="Ar">file</var></dt>
   <dd>Read a list of dynamic symbols from
     <var class="Ar" title="Ar">file</var>.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-eh-frame-hdr"><code class="Fl" title="Fl" id="-eh-frame-hdr">--eh-frame-hdr</code></a>,
     <code class="Fl" title="Fl">--no-eh-frame-hdr</code></dt>
   <dd>Create <code class="Dv" title="Dv">.eh_frame_hdr</code> section.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-exclude-libs"><code class="Fl" title="Fl" id="-exclude-libs">--exclude-libs</code></a>=<var class="Ar" title="Ar">libraries</var>...</dt>
   <dd>Mark all symbols in the given <var class="Ar" title="Ar">libraries</var>
       hidden.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-fini"><code class="Fl" title="Fl" id="-fini">--fini</code></a>=<var class="Ar" title="Ar">symbol</var></dt>
   <dd>Call <var class="Ar" title="Ar">symbol</var> at unload-time.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-fork"><code class="Fl" title="Fl" id="-fork">--fork</code></a>,
     <code class="Fl" title="Fl">--no-fork</code></dt>
   <dd>Spawn a child process and let it do the actual linking. When linking a
       large program, the OS kernel can take a few hundred milliseconds to
       terminate a <code class="Nm" title="Nm">mold</code> process.
       <code class="Fl" title="Fl">--fork</code> hides that latency.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-gc-sections"><code class="Fl" title="Fl" id="-gc-sections">--gc-sections</code></a>,
     <code class="Fl" title="Fl">--no-gc-sections</code></dt>
   <dd>Remove unreferenced sections.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-hash-style"><code class="Fl" title="Fl" id="-hash-style">--hash-style</code></a>=[<div class="Op"><b class="Sy" title="Sy">sysv</b>
     | <b class="Sy" title="Sy">gnu</b> |
     <b class="Sy" title="Sy">both</b></div>]</dt>
   <dd>Set hash style.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-icf"><code class="Fl" title="Fl" id="-icf">--icf</code></a>=<b class="Sy" title="Sy">all</b>,
     <code class="Fl" title="Fl">--no-icf</code></dt>
   <dd>Fold identical code.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-image-base"><code class="Fl" title="Fl" id="-image-base">--image-base</code></a>=<var class="Ar" title="Ar">addr</var></dt>
   <dd>Set the base address to <var class="Ar" title="Ar">addr</var>.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-init"><code class="Fl" title="Fl" id="-init">--init</code></a>=<var class="Ar" title="Ar">symbol</var></dt>
   <dd>Call <var class="Ar" title="Ar">symbol</var> at load-time.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-no-undefined"><code class="Fl" title="Fl" id="-no-undefined">--no-undefined</code></a></dt>
   <dd>Report undefined symbols (even with
       <code class="Fl" title="Fl">--shared</code>).</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-perf"><code class="Fl" title="Fl" id="-perf">--perf</code></a></dt>
   <dd>Print performance statistics.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-pie"><code class="Fl" title="Fl" id="-pie">--pie</code></a>,
     <code class="Fl" title="Fl">--pic-executable</code>,
     <code class="Fl" title="Fl">--no-pie</code>,
     <code class="Fl" title="Fl">--no-pic-executable</code></dt>
   <dd>Create a position-independent executable.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-pop-state"><code class="Fl" title="Fl" id="-pop-state">--pop-state</code></a></dt>
   <dd>Pop state of flags governing input file handling.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-preload"><code class="Fl" title="Fl" id="-preload">--preload</code></a></dt>
   <dd>Preload object files.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-print-gc-sections"><code class="Fl" title="Fl" id="-print-gc-sections">--print-gc-sections</code></a>,
     <code class="Fl" title="Fl">--no-print-gc-sections</code></dt>
   <dd>Print removed unreferenced sections.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-print-icf-sections"><code class="Fl" title="Fl" id="-print-icf-sections">--print-icf-sections</code></a>,
     <code class="Fl" title="Fl">--no-print-icf-sections</code></dt>
   <dd>Print folded identical sections.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-push-state"><code class="Fl" title="Fl" id="-push-state">--push-state</code></a></dt>
   <dd>Pop state of flags governing input file handling</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-quick-exit"><code class="Fl" title="Fl" id="-quick-exit">--quick-exit</code></a>,
     <code class="Fl" title="Fl">--no-quick-exit</code></dt>
   <dd>Use <code class="Dv" title="Dv">quick_exit</code> to exit.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-relax"><code class="Fl" title="Fl" id="-relax">--relax</code></a>,
     <code class="Fl" title="Fl">--no-relax</code></dt>
   <dd>Rewrite machine instructions with more efficient ones for some
       relocations. The feature is enabled by default.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-require-defined"><code class="Fl" title="Fl" id="-require-defined">--require-defined</code></a>=<var class="Ar" title="Ar">symbol</var></dt>
   <dd>Like <code class="Fl" title="Fl">--undefined</code>, except the new symbol
       must be defined by the end of the link.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-repro"><code class="Fl" title="Fl" id="-repro">--repro</code></a></dt>
   <dd>Embed input files into <code class="Dv" title="Dv">.repro</code>
     section.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-retain-symbols-file"><code class="Fl" title="Fl" id="-retain-symbols-file">--retain-symbols-file</code></a>=<var class="Ar" title="Ar">file</var></dt>
   <dd>Keep only symbols listed in <var class="Ar" title="Ar">file</var>.
     <div class="Pp"></div>
@@ -474,8 +579,12 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
       symbols only from <code class="Dv" title="Dv">.symtab</code> section and
       does not affect <code class="Dv" title="Dv">.dynsym</code> section, which
       is used for dynamic linking.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-rpath"><code class="Fl" title="Fl" id="-rpath">--rpath</code></a>=<var class="Ar" title="Ar">dir</var></dt>
   <dd>Add <var class="Ar" title="Ar">dir</var> to runtime search path.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-run"><code class="Fl" title="Fl" id="-run">--run</code></a>
     <code class="Cm" title="Cm">command</code>
     <var class="Ar" title="Ar">arg</var> <var class="Ar" title="Ar">file
@@ -483,21 +592,35 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
   <dd>Run <code class="Cm" title="Cm">command</code> with
       <code class="Nm" title="Nm">mold</code> as
       <span class="Pa" title="Pa">/usr/bin/ld</span>.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-shared"><code class="Fl" title="Fl" id="-shared">--shared</code></a>,
     <code class="Fl" title="Fl">--Bshareable</code></dt>
   <dd>Create a share library.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-spare-dynamic-tags"><code class="Fl" title="Fl" id="-spare-dynamic-tags">--spare-dynamic-tags</code></a>=<var class="Ar" title="Ar">number</var></dt>
   <dd>Reserve given <var class="Ar" title="Ar">number</var> of tags in
       <code class="Dv" title="Dv">.dynamic</code> section.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-static"><code class="Fl" title="Fl" id="-static">--static</code></a></dt>
   <dd>Do not link against shared libraries.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-stats"><code class="Fl" title="Fl" id="-stats">--stats</code></a></dt>
   <dd>Print input statistics.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-sysroot"><code class="Fl" title="Fl" id="-sysroot">--sysroot</code></a>=<var class="Ar" title="Ar">dir</var></dt>
   <dd>Set target system root directory to
     <var class="Ar" title="Ar">dir</var>.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-thread-count"><code class="Fl" title="Fl" id="-thread-count">--thread-count</code></a>=<var class="Ar" title="Ar">count</var></dt>
   <dd>Use <var class="Ar" title="Ar">count</var> number of threads.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-threads"><code class="Fl" title="Fl" id="-threads">--threads</code></a>,
     <code class="Fl" title="Fl">--no-threads</code></dt>
   <dd>Use multiple threads. By default, <code class="Nm" title="Nm">mold</code>
@@ -507,22 +630,34 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
       point. To use only one thread, pass
       <code class="Fl" title="Fl">--no-threads</code> or
       <code class="Fl" title="Fl">--thread-count</code>=<b class="Sy" title="Sy">1</b>.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-trace"><code class="Fl" title="Fl" id="-trace">--trace</code></a></dt>
   <dd>Print name of each input file.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-unique"><code class="Fl" title="Fl" id="-unique">--unique</code></a>=<var class="Ar" title="Ar">pattern</var></dt>
   <dd>Don't merge input sections that match
       <var class="Ar" title="Ar">pattern</var>.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-unresolved-symbols"><code class="Fl" title="Fl" id="-unresolved-symbols">--unresolved-symbols</code></a>=[<div class="Op"><b class="Sy" title="Sy">report-all</b>
     | <b class="Sy" title="Sy">ignore-all</b> |
     <b class="Sy" title="Sy">ignore-in-object-files</b> |
     <b class="Sy" title="Sy">ignore-in-shared-libs</b></div>]</dt>
   <dd>How to handle undefined symbols.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-version-script"><code class="Fl" title="Fl" id="-version-script">--version-script</code></a>=<var class="Ar" title="Ar">file</var></dt>
   <dd>Read version script from <var class="Ar" title="Ar">file</var>.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-warn-common"><code class="Fl" title="Fl" id="-warn-common">--warn-common</code></a></dt>
   <dd style="width: auto;">&#x00A0;</dd>
   <dt><a class="permalink" href="#-no-warn-common"><code class="Fl" title="Fl" id="-no-warn-common">--no-warn-common</code></a></dt>
   <dd>Warn about common symbols.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-warn-unresolved-symbols"><code class="Fl" title="Fl" id="-warn-unresolved-symbols">--warn-unresolved-symbols</code></a>,
     <code class="Fl" title="Fl">--error-unresolved-symbols</code></dt>
   <dd>Normally, the linker reports an error for unresolved symbols.
@@ -530,6 +665,8 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
       it into a warning.
       <code class="Fl" title="Fl">--error-unresolved-symbols</code> option
       restores the default behavior.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-whole-archive"><code class="Fl" title="Fl" id="-whole-archive">--whole-archive</code></a>,
     <code class="Fl" title="Fl">--no-whole-archive</code></dt>
   <dd>When archive files (<b class="Sy" title="Sy">.a</b> files) are given to a
@@ -542,12 +679,16 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
       pass <code class="Fl" title="Fl">--whole-archive</code>.
       <code class="Fl" title="Fl">--no-whole-archive</code> restores the default
       behavior for subsequent archives.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-wrap"><code class="Fl" title="Fl" id="-wrap">--wrap</code></a>=<var class="Ar" title="Ar">symbol</var></dt>
   <dd>Make <var class="Ar" title="Ar">symbol</var> to be resolved to
       <b class="Sy" title="Sy">__wrap_</b><var class="Ar" title="Ar">symbol</var>.
       The original symbol can be resolved as
       <b class="Sy" title="Sy">__real_</b><var class="Ar" title="Ar">symbol</var>.
       This option is typically used for wrapping an existing function.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#z"><code class="Fl" title="Fl" id="z">-z</code></a>
     <code class="Cm" title="Cm">now</code>,
     <code class="Fl" title="Fl">-z</code>
@@ -560,10 +701,14 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
       to memory. <code class="Fl" title="Fl">-z</code>
       <code class="Cm" title="Cm">lazy</code> restores the default
     behavior.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#z_2"><code class="Fl" title="Fl" id="z_2">-z</code></a>
     <code class="Cm" title="Cm">origin</code></dt>
   <dd>Mark object requiring immediate <code class="Dv" title="Dv">$ORIGIN</code>
       processing at runtime.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#z_3"><code class="Fl" title="Fl" id="z_3">-z</code></a>
     <code class="Cm" title="Cm">execstack</code>,
     <code class="Fl" title="Fl">-z</code>
@@ -575,6 +720,8 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
       <code class="Fl" title="Fl">-z</code>
       <code class="Cm" title="Cm">noexecstack</code> restores the default
       behavior.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#z_4"><code class="Fl" title="Fl" id="z_4">-z</code></a>
     <code class="Cm" title="Cm">keep-text-section-prefix</code>,
     <code class="Fl" title="Fl">-z</code>
@@ -585,6 +732,8 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
       <code class="Dv" title="Dv">.text.startup</code> and
       <code class="Dv" title="Dv">.text.exit</code> as separate sections in the
       final binary.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#z_5"><code class="Fl" title="Fl" id="z_5">-z</code></a>
     <code class="Cm" title="Cm">relro</code>,
     <code class="Fl" title="Fl">-z</code>
@@ -604,6 +753,8 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
       <b class="Sy" title="Sy">relro</b> segment.
       <code class="Fl" title="Fl">-z</code>
       <code class="Cm" title="Cm">norelro</code> disables the feature.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#z_6"><code class="Fl" title="Fl" id="z_6">-z</code></a>
     <code class="Cm" title="Cm">separate-loadable-segments</code>,
     <code class="Fl" title="Fl">-z</code>
@@ -624,12 +775,16 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
     <div class="Pp"></div>
     <code class="Cm" title="Cm">noseparate-code</code> does not add any paddings
       between segments.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#z_7"><code class="Fl" title="Fl" id="z_7">-z</code></a>
     <code class="Cm" title="Cm">defs</code>,
     <code class="Fl" title="Fl">-z</code>
     <code class="Cm" title="Cm">nodefs</code></dt>
   <dd>Report undefined symbols (even with
       <code class="Fl" title="Fl">--shared</code>).</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#z_8"><code class="Fl" title="Fl" id="z_8">-z</code></a>
     <code class="Cm" title="Cm">max-page-size</code></dt>
   <dd>Some CPU ISAs support multiple different memory page sizes. This option
@@ -639,24 +794,38 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
       small pages.
     <div class="Pp"></div>
     The default value is 4 KiB for i386 and x86-64, and 64 KiB for ARM64.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#z_9"><code class="Fl" title="Fl" id="z_9">-z</code></a>
     <code class="Cm" title="Cm">nodefaultlib</code></dt>
   <dd>Make the dynamic loader to ignore default search paths.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#z_10"><code class="Fl" title="Fl" id="z_10">-z</code></a>
     <code class="Cm" title="Cm">nodelete</code></dt>
   <dd>Mark DSO non-deletable at runtime.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#z_11"><code class="Fl" title="Fl" id="z_11">-z</code></a>
     <code class="Cm" title="Cm">nodlopen</code></dt>
   <dd>Mark DSO not available to <a class="Xr" title="Xr">dlopen(3)</a>.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#z_12"><code class="Fl" title="Fl" id="z_12">-z</code></a>
     <code class="Cm" title="Cm">nodump</code></dt>
   <dd>Mark DSO not available to <a class="Xr" title="Xr">dldump(3)</a>.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#z_13"><code class="Fl" title="Fl" id="z_13">-z</code></a>
     <code class="Cm" title="Cm">nocopyreloc</code></dt>
   <dd>Do not create copy relocations.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#z_14"><code class="Fl" title="Fl" id="z_14">-z</code></a>
     <code class="Cm" title="Cm">initfirst</code></dt>
   <dd>Mark DSO to be initialized first at runtime.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#z_15"><code class="Fl" title="Fl" id="z_15">-z</code></a>
     <code class="Cm" title="Cm">interpose</code></dt>
   <dd>Mark object to interpose all DSOs but executable.</dd>

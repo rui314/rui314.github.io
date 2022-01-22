@@ -521,14 +521,17 @@ These Unix semantics are tricky and sometimes considered harmful. For example,
   <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-pack-dyn-relocs"><code class="Fl" title="Fl" id="-pack-dyn-relocs">--pack-dyn-relocs</code></a>=[<div class="Op"><b class="Sy" title="Sy">none</b>
     | <b class="Sy" title="Sy">relr</b></div>]</dt>
-  <dd>If <b class="Sy" title="Sy">relr</b> is specified, all relocations are put
-      into section instead of or section. Since section uses a space-efficient
-      encoding scheme, specifying that flag can reduce the size of the output.
-      This is typically most effective for position-independent executable. Note
-      that a runtime loader has to support to run executables or shared
-      libraries linked with
-      <code class="Fl" title="Fl">--pack-dyn-relocs=relr</code>, and only
-      ChromeOS, Android and Fuchsia support it as of now in 2022.</dd>
+  <dd>If <b class="Sy" title="Sy">relr</b> is specified, all
+      <code class="Li">R_*_RELATIVE</code> relocations are put into
+      <code class="Li">.relr.dyn</code> section instead of
+      <code class="Li">.rel.dyn</code> or <code class="Li">.rela.dyn</code>
+      section. Since <code class="Li">.relr.dyn</code> section uses a
+      space-efficient encoding scheme, specifying that flag can reduce the size
+      of the output. This is typically most effective for position-independent
+      executable. Note that a runtime loader has to support
+      <code class="Li">.relr.dyn</code> to run executables or shared libraries
+      linked with <code class="Fl" title="Fl">--pack-dyn-relocs=relr</code>, and
+      only ChromeOS, Android and Fuchsia support it as of now in 2022.</dd>
   <dt>&#x00A0;</dt>
   <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-perf"><code class="Fl" title="Fl" id="-perf">--perf</code></a></dt>

@@ -153,15 +153,15 @@ Let me take <a class="Xr" title="Xr">malloc(3)</a> as an example. Assume that
   you define your version of <a class="Xr" title="Xr">malloc(3)</a> in your main
   executable file. Then, all <b class="Sy" title="Sy">malloc</b> calls from any
   module are resolved to your function instead of that in libc, because the
-  executable is at the beginning of the dynamic symbol search list. Note that
-  even <a class="Xr" title="Xr">malloc(3)</a> calls within libc are resolved to
-  your definition since libc exports and imports
+  executable is always at the beginning of the dynamic symbol search list. Note
+  that even <a class="Xr" title="Xr">malloc(3)</a> calls within libc are
+  resolved to your definition since libc exports and imports
   <b class="Sy" title="Sy">malloc</b>. Therefore, by defining
   <b class="Sy" title="Sy">malloc</b> yourself, you can overwrite a library
   function, and the <a class="Xr" title="Xr">malloc(3)</a> in libc becomes dead
   code.
 <div class="Pp"></div>
-Thess Unix semantics are tricky and sometimes considered harmful. For example,
+These Unix semantics are tricky and sometimes considered harmful. For example,
   assume that you accidentally define <a class="Xr" title="Xr">atoi(3)</a> as a
   global function in your executable that behaves completely differently from
   the one in the C standard. Then, all <b class="Sy" title="Sy">atoi</b>
@@ -176,10 +176,10 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
   reproducibility</a></h2>
 <code class="Nm" title="Nm">mold</code>'s output is deterministic. That is, if
   you pass the same object files and the same command-line options to the same
-  version of <code class="Nm" title="Nm">mold</code>, it is guaranteed that the
-  output is always bit-wise the same. The linker's internal randomness, such as
-  the timing of thread scheduling or iteration orders of hash tables, doesn't
-  affect the output.
+  version of <code class="Nm" title="Nm">mold</code>, it is guaranteed to always
+  produce the same output. The linker's internal randomness, such as the timing
+  of thread scheduling or iteration orders of hash tables, doesn't affect the
+  output.
 <div class="Pp"></div>
 <code class="Nm" title="Nm">mold</code> does not have any host-specific default
   settings. This is contrary to the GNU linkers to which some configurable
@@ -271,8 +271,7 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
   <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#S"><code class="Fl" title="Fl" id="S">-S</code></a>,
     <code class="Fl" title="Fl">--strip-debug</code></dt>
-  <dd>Omit <b class="Sy" title="Sy">.debug_*</b> sections from the output
-    file.</dd>
+  <dd>Omit <code class="Li">.debug_*</code> sections from the output file.</dd>
   <dt>&#x00A0;</dt>
   <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#T"><code class="Fl" title="Fl" id="T">-T</code></a>
@@ -348,8 +347,7 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
   <dt><a class="permalink" href="#s"><code class="Fl" title="Fl" id="s">-s</code></a>,
     <code class="Fl" title="Fl">-FL</code>
     <code class="Fl" title="Fl">--strip-all</code></dt>
-  <dd>Omit <code class="Dv" title="Dv">.symtab</code> section from the output
-      file.</dd>
+  <dd>Omit <code class="Li">.symtab</code> section from the output file.</dd>
   <dt>&#x00A0;</dt>
   <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#u"><code class="Fl" title="Fl" id="u">-u</code></a>
@@ -421,8 +419,8 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
     | <b class="Sy" title="Sy">md5</b> | <b class="Sy" title="Sy">sha1</b> |
     <b class="Sy" title="Sy">sha256</b> | <b class="Sy" title="Sy">uuid</b> |
     <b class="Sy" title="Sy">0x</b><var class="Ar" title="Ar">hexstring</var></div>]</dt>
-  <dd>Create a <code class="Dv" title="Dv">.note.gnu.build-id</code> section
-      containing a byte string to uniquely identify an output file.
+  <dd>Create a <code class="Li">.note.gnu.build-id</code> section containing a
+      byte string to uniquely identify an output file.
       <code class="Fl" title="Fl">--build-id</code> and
       <code class="Fl" title="Fl">--build-id</code>=<b class="Sy" title="Sy">sha256</b>
       compute a 256-bit cryptographic hash of an output file and set it to
@@ -438,13 +436,14 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
   <dd>Set <var class="Ar" title="Ar">dir</var> to root directory.</dd>
   <dt>&#x00A0;</dt>
   <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-compress-debug-sections_fR=__fInone_fR,_fIzlib_fR,_fIzlib-gabi_fR,_fIzlib-gnu_fR__"><code class="Fl" title="Fl" id="-compress-debug-sections_fR=__fInone_fR,_fIzlib_fR,_fIzlib-gabi_fR,_fIzlib-gnu_fR__">--compress-debug-sections=[<i>none</i>,<i>zlib</i>,<i>zlib-gabi</i>,<i>zlib-gnu</i>]&quot;</code></a></dt>
+  <dt><a class="permalink" href="#-compress-debug-sections"><code class="Fl" title="Fl" id="-compress-debug-sections">--compress-debug-sections</code></a>=[<div class="Op"><b class="Sy" title="Sy">none</b>
+    | <b class="Sy" title="Sy">zlib</b> | <b class="Sy" title="Sy">zlib-gabi</b>
+    | <b class="Sy" title="Sy">zlib-gnu</b></div>]</dt>
   <dd>Compress DWARF debug info (<b class="Sy" title="Sy">.debug_*</b> sections)
       using the zlib compression algorithm.</dd>
   <dt>&#x00A0;</dt>
   <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-defsym__Ns"><code class="Fl" title="Fl" id="-defsym__Ns">--defsym&#x00A0;Ns</code></a>
-    <code class="Fl" title="Fl">-=</code><var class="Ar" title="Ar">symbol</var>=<var class="Ar" title="Ar">value</var></dt>
+  <dt><a class="permalink" href="#-defsym"><code class="Fl" title="Fl" id="-defsym">--defsym</code></a>=<var class="Ar" title="Ar">symbol</var>=<var class="Ar" title="Ar">value</var></dt>
   <dd>Define <var class="Ar" title="Ar">symbol</var> as an alias for
       <var class="Ar" title="Ar">value</var>.
     <div class="Pp"></div>
@@ -452,6 +451,11 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
       hexadecimal with &#x2018;0x&#x2019; prefix) or a symbol name. If an
       integer is given as a value, <var class="Ar" title="Ar">symbol</var> is
       defined as an absolute symbol with the given value.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
+  <dt><a class="permalink" href="#-default-symver"><code class="Fl" title="Fl" id="-default-symver">--default-symver</code></a></dt>
+  <dd>Use soname as a symbol version and append that version to all
+    symbols.</dd>
   <dt>&#x00A0;</dt>
   <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-demangle"><code class="Fl" title="Fl" id="-demangle">--demangle</code></a>,
@@ -466,7 +470,7 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
   <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-eh-frame-hdr"><code class="Fl" title="Fl" id="-eh-frame-hdr">--eh-frame-hdr</code></a>,
     <code class="Fl" title="Fl">--no-eh-frame-hdr</code></dt>
-  <dd>Create <code class="Dv" title="Dv">.eh_frame_hdr</code> section.</dd>
+  <dd>Create <code class="Li">.eh_frame_hdr</code> section.</dd>
   <dt>&#x00A0;</dt>
   <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-exclude-libs"><code class="Fl" title="Fl" id="-exclude-libs">--exclude-libs</code></a>=<var class="Ar" title="Ar">libraries</var>...</dt>
@@ -513,6 +517,18 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
   <dt><a class="permalink" href="#-no-undefined"><code class="Fl" title="Fl" id="-no-undefined">--no-undefined</code></a></dt>
   <dd>Report undefined symbols (even with
       <code class="Fl" title="Fl">--shared</code>).</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
+  <dt><a class="permalink" href="#-pack-dyn-relocs"><code class="Fl" title="Fl" id="-pack-dyn-relocs">--pack-dyn-relocs</code></a>=[<div class="Op"><b class="Sy" title="Sy">none</b>
+    | <b class="Sy" title="Sy">relr</b></div>]</dt>
+  <dd>If <b class="Sy" title="Sy">relr</b> is specified, all relocations are put
+      into section instead of or section. Since section uses a space-efficient
+      encoding scheme, specifying that flag can reduce the size of the output.
+      This is typically most effective for position-independent executable. Note
+      that a runtime loader has to support to run executables or shared
+      libraries linked with
+      <code class="Fl" title="Fl">--pack-dyn-relocs=relr</code>, and only
+      ChromeOS, Android and Fuchsia support it as of now in 2022.</dd>
   <dt>&#x00A0;</dt>
   <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#-perf"><code class="Fl" title="Fl" id="-perf">--perf</code></a></dt>
@@ -690,6 +706,33 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
   <dt>&#x00A0;</dt>
   <dd>&#x00A0;</dd>
   <dt><a class="permalink" href="#z"><code class="Fl" title="Fl" id="z">-z</code></a>
+    <code class="Cm" title="Cm">cet-report</code>=<b class="Sy" title="Sy">none</b>
+    | <b class="Sy" title="Sy">warning</b> |
+    <b class="Sy" title="Sy">error</b></dt>
+  <dd>Intel Control-flow Enforcement Technology (CET) is a new x86 feature
+      available since Tiger Lake which is released in 2020. It defines new
+      instructions to harden security to protect programs from control hijacking
+      attacks. You can tell compiler to use the feature by specifying the
+      <code class="Fl" title="Fl">-fcf-protection</code> flag.
+    <div class="Pp"></div>
+    <code class="Fl" title="Fl">-z</code>
+      <code class="Cm" title="Cm">cet-report</code> flag is used to make sure
+      that all object files were compiled with a correct
+      <code class="Fl" title="Fl">-fcf-protection</code> flag. If
+      <b class="Sy" title="Sy">warning</b> or <b class="Sy" title="Sy">error</b>
+      are given, <code class="Nm" title="Nm">mold</code> prints out a warning or
+      an error message if an object file was not compiled with the compiler
+      flag.
+    <div class="Pp"></div>
+    <code class="Nm" title="Nm">mold</code> looks for
+      <code class="Li">GNU_PROPERTY_X86_FEATURE_1_IBT</code> bit and
+      <code class="Li">GNU_PROPERTY_X86_FEATURE_1_SHSTK</code> bit in
+      <code class="Li">.note.gnu.property</code> section to determine whether or
+      not an object file was compiled with
+      <code class="Fl" title="Fl">-fcf-protection</code>.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
+  <dt><a class="permalink" href="#z_2"><code class="Fl" title="Fl" id="z_2">-z</code></a>
     <code class="Cm" title="Cm">now</code>,
     <code class="Fl" title="Fl">-z</code>
     <code class="Cm" title="Cm">lazy</code></dt>
@@ -703,13 +746,41 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
     behavior.</dd>
   <dt>&#x00A0;</dt>
   <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#z_2"><code class="Fl" title="Fl" id="z_2">-z</code></a>
+  <dt><a class="permalink" href="#z_3"><code class="Fl" title="Fl" id="z_3">-z</code></a>
     <code class="Cm" title="Cm">origin</code></dt>
   <dd>Mark object requiring immediate <code class="Dv" title="Dv">$ORIGIN</code>
       processing at runtime.</dd>
   <dt>&#x00A0;</dt>
   <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#z_3"><code class="Fl" title="Fl" id="z_3">-z</code></a>
+  <dt><a class="permalink" href="#z_4"><code class="Fl" title="Fl" id="z_4">-z</code></a>
+    <code class="Cm" title="Cm">ibt</code></dt>
+  <dd>Turn on <code class="Li">GNU_PROPERTY_X86_FEATURE_1_IBT</code> bit in
+      <code class="Li">.note.gnu.property</code> section to indicate that the
+      output uses IBT-enabled PLT. This option implies
+      <code class="Fl" title="Fl">-z</code>
+      <code class="Cm" title="Cm">ibtplt</code>.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
+  <dt><a class="permalink" href="#z_5"><code class="Fl" title="Fl" id="z_5">-z</code></a>
+    <code class="Cm" title="Cm">ibtplt</code></dt>
+  <dd>Generate Intel Branch Tracking (IBT)-enabled PLT.
+    <div class="Pp"></div>
+    IBT is part of Intel Control-flow Enforcement Technology (CET). IBT is a new
+      x86 feature available since Tiger Lake which is released in 2020. If IBT
+      is enabled, all indirect branch instructions have to branch to a so-called
+      &quot;landing pad&quot; instruction. Landing pad itself is a no-op, but it
+      works as a marker that branching to that instruction is expected. If
+      there's no landing pad after branch, the CPU raises an exception. This
+      mechanism makes ROP attacks difficult.
+    <div class="Pp"></div>
+    Since PLT can be used as an indirect branch target, we need a different
+      instruction sequence for IBT-enabled PLT. If <b class="Sy" title="Sy">-z
+      ibtplt</b> is specified, <code class="Nm" title="Nm">mold</code> generates
+      PLT entries that start with a landing pad. The size of IBT-enabled PLT is
+      24 bytes as opposed to 16 bytes regular PLT.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
+  <dt><a class="permalink" href="#z_6"><code class="Fl" title="Fl" id="z_6">-z</code></a>
     <code class="Cm" title="Cm">execstack</code>,
     <code class="Fl" title="Fl">-z</code>
     <code class="Cm" title="Cm">noexecstack</code></dt>
@@ -722,7 +793,7 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
       behavior.</dd>
   <dt>&#x00A0;</dt>
   <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#z_4"><code class="Fl" title="Fl" id="z_4">-z</code></a>
+  <dt><a class="permalink" href="#z_7"><code class="Fl" title="Fl" id="z_7">-z</code></a>
     <code class="Cm" title="Cm">keep-text-section-prefix</code>,
     <code class="Fl" title="Fl">-z</code>
     <code class="Cm" title="Cm">nokeep-text-section-prefix</code></dt>
@@ -734,7 +805,7 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
       final binary.</dd>
   <dt>&#x00A0;</dt>
   <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#z_5"><code class="Fl" title="Fl" id="z_5">-z</code></a>
+  <dt><a class="permalink" href="#z_8"><code class="Fl" title="Fl" id="z_8">-z</code></a>
     <code class="Cm" title="Cm">relro</code>,
     <code class="Fl" title="Fl">-z</code>
     <code class="Cm" title="Cm">norelro</code></dt>
@@ -755,7 +826,7 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
       <code class="Cm" title="Cm">norelro</code> disables the feature.</dd>
   <dt>&#x00A0;</dt>
   <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#z_6"><code class="Fl" title="Fl" id="z_6">-z</code></a>
+  <dt><a class="permalink" href="#z_9"><code class="Fl" title="Fl" id="z_9">-z</code></a>
     <code class="Cm" title="Cm">separate-loadable-segments</code>,
     <code class="Fl" title="Fl">-z</code>
     <code class="Cm" title="Cm">separate-code</code>,
@@ -777,7 +848,7 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
       between segments.</dd>
   <dt>&#x00A0;</dt>
   <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#z_7"><code class="Fl" title="Fl" id="z_7">-z</code></a>
+  <dt><a class="permalink" href="#z_10"><code class="Fl" title="Fl" id="z_10">-z</code></a>
     <code class="Cm" title="Cm">defs</code>,
     <code class="Fl" title="Fl">-z</code>
     <code class="Cm" title="Cm">nodefs</code></dt>
@@ -785,7 +856,33 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
       <code class="Fl" title="Fl">--shared</code>).</dd>
   <dt>&#x00A0;</dt>
   <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#z_8"><code class="Fl" title="Fl" id="z_8">-z</code></a>
+  <dt><a class="permalink" href="#z_11"><code class="Fl" title="Fl" id="z_11">-z</code></a>
+    <code class="Cm" title="Cm">shstk</code></dt>
+  <dd>Enforce shadow stack by turning GNU_PROPERTY_X86_FEATURE_1_SHSTK bit in
+      <code class="Li">.note.gnu.property</code> output section. Shadow stack is
+      part of Intel Control-flow Enforcement Technology (CET), which is
+      available since Tiger Lake (2020).</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
+  <dt><code class="Fl" title="Fl">-</code><code class="Fl" title="Fl">-z</code>
+    <code class="Cm" title="Cm">notext</code>,
+    <code class="Fl" title="Fl">-z</code>
+    <code class="Cm" title="Cm">textoff</code>,
+    <code class="Fl" title="Fl">-z</code>
+    <code class="Cm" title="Cm">text</code></dt>
+  <dd><code class="Nm" title="Nm">mold</code> by default reports an error if
+      dynamic relocations are created in read-only sections. If
+      <code class="Fl" title="Fl">-z</code>
+      <code class="Cm" title="Cm">notext</code> or
+      <code class="Fl" title="Fl">-z</code>
+      <code class="Cm" title="Cm">textoff</code> are given,
+      <code class="Nm" title="Nm">mold</code> creates such dynamic relocations
+      without reporting an error. <code class="Fl" title="Fl">-z</code>
+      <code class="Cm" title="Cm">text</code> restores the default
+    behavior.</dd>
+  <dt>&#x00A0;</dt>
+  <dd>&#x00A0;</dd>
+  <dt><a class="permalink" href="#z_12"><code class="Fl" title="Fl" id="z_12">-z</code></a>
     <code class="Cm" title="Cm">max-page-size</code></dt>
   <dd>Some CPU ISAs support multiple different memory page sizes. This option
       specifies the maximum page size that an output binary can run on. If you
@@ -796,37 +893,37 @@ Thess Unix semantics are tricky and sometimes considered harmful. For example,
     The default value is 4 KiB for i386 and x86-64, and 64 KiB for ARM64.</dd>
   <dt>&#x00A0;</dt>
   <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#z_9"><code class="Fl" title="Fl" id="z_9">-z</code></a>
+  <dt><a class="permalink" href="#z_13"><code class="Fl" title="Fl" id="z_13">-z</code></a>
     <code class="Cm" title="Cm">nodefaultlib</code></dt>
   <dd>Make the dynamic loader to ignore default search paths.</dd>
   <dt>&#x00A0;</dt>
   <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#z_10"><code class="Fl" title="Fl" id="z_10">-z</code></a>
+  <dt><a class="permalink" href="#z_14"><code class="Fl" title="Fl" id="z_14">-z</code></a>
     <code class="Cm" title="Cm">nodelete</code></dt>
   <dd>Mark DSO non-deletable at runtime.</dd>
   <dt>&#x00A0;</dt>
   <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#z_11"><code class="Fl" title="Fl" id="z_11">-z</code></a>
+  <dt><a class="permalink" href="#z_15"><code class="Fl" title="Fl" id="z_15">-z</code></a>
     <code class="Cm" title="Cm">nodlopen</code></dt>
   <dd>Mark DSO not available to <a class="Xr" title="Xr">dlopen(3)</a>.</dd>
   <dt>&#x00A0;</dt>
   <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#z_12"><code class="Fl" title="Fl" id="z_12">-z</code></a>
+  <dt><a class="permalink" href="#z_16"><code class="Fl" title="Fl" id="z_16">-z</code></a>
     <code class="Cm" title="Cm">nodump</code></dt>
   <dd>Mark DSO not available to <a class="Xr" title="Xr">dldump(3)</a>.</dd>
   <dt>&#x00A0;</dt>
   <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#z_13"><code class="Fl" title="Fl" id="z_13">-z</code></a>
+  <dt><a class="permalink" href="#z_17"><code class="Fl" title="Fl" id="z_17">-z</code></a>
     <code class="Cm" title="Cm">nocopyreloc</code></dt>
   <dd>Do not create copy relocations.</dd>
   <dt>&#x00A0;</dt>
   <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#z_14"><code class="Fl" title="Fl" id="z_14">-z</code></a>
+  <dt><a class="permalink" href="#z_18"><code class="Fl" title="Fl" id="z_18">-z</code></a>
     <code class="Cm" title="Cm">initfirst</code></dt>
   <dd>Mark DSO to be initialized first at runtime.</dd>
   <dt>&#x00A0;</dt>
   <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#z_15"><code class="Fl" title="Fl" id="z_15">-z</code></a>
+  <dt><a class="permalink" href="#z_19"><code class="Fl" title="Fl" id="z_19">-z</code></a>
     <code class="Cm" title="Cm">interpose</code></dt>
   <dd>Mark object to interpose all DSOs but executable.</dd>
 </dl>
@@ -842,7 +939,7 @@ Report bugs to
   <a class="Lk" title="Lk" href="https://github.com/rui314/mold/issues">https://github.com/rui314/mold/issues</a>.</div>
 <table class="foot">
   <tr>
-    <td class="foot-date">January 3, 2022</td>
+    <td class="foot-date">January 22, 2022</td>
     <td class="foot-os">Debian</td>
   </tr>
 </table>

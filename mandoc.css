@@ -18,7 +18,7 @@ body {		background: var(--bg);
                 max-width: 800px;
                 margin: 50px auto;
                 line-height: 1.6em;
-		font-family: Arial,sans-serif; }
+		font-family: Verdana,Arial,sans-serif; }
 h1 {		font-size: 110%; }
 table {		margin-top: 0em;
 		margin-bottom: 0em;

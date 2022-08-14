@@ -46,904 +46,1099 @@
   </tr>
 </table>
 <div class="manual-text">
-<h1 class="Sh" title="Sh" id="NAME"><a class="permalink" href="#NAME">NAME</a></h1>
-<code class="Nm" title="Nm">mold</code> &#x2014;
-<div class="Nd" title="Nd">a modern linker</div>
-<h1 class="Sh" title="Sh" id="SYNOPSIS"><a class="permalink" href="#SYNOPSIS">SYNOPSIS</a></h1>
+<section class="Sh">
+<h1 class="Sh" id="NAME"><a class="permalink" href="#NAME">NAME</a></h1>
+<p class="Pp"><code class="Nm">mold</code> &#x2014; <span class="Nd">a modern
+    linker</span></p>
+</section>
+<section class="Sh">
+<h1 class="Sh" id="SYNOPSIS"><a class="permalink" href="#SYNOPSIS">SYNOPSIS</a></h1>
 <table class="Nm">
   <tr>
-    <td><code class="Nm" title="Nm">mold</code></td>
-    <td>[<div class="Op"><code class="Fl" title="Fl">-options</code></div>]
-      <var class="Ar" title="Ar">objfile ...</var></td>
+    <td><code class="Nm">mold</code></td>
+    <td>[<code class="Fl">-options</code>] <var class="Ar">objfile
+      ...</var></td>
   </tr>
 </table>
-<h1 class="Sh" title="Sh" id="DESCRIPTION"><a class="permalink" href="#DESCRIPTION">DESCRIPTION</a></h1>
-<code class="Nm" title="Nm">mold</code> is a faster drop-in replacement for the
-  default GNU <a class="Xr" title="Xr">ld(1)</a>.
-<h2 class="Ss" title="Ss">How to use
-  <code class="Nm" title="Nm">mold</code></h2>
-See
-  <a class="Lk" title="Lk" href="https://github.com/rui314/mold#how-to-use">https://github.com/rui314/mold#how-to-use</a>.
-<h2 class="Ss" title="Ss" id="Compatibility"><a class="permalink" href="#Compatibility">Compatibility</a></h2>
-<code class="Nm" title="Nm">mold</code> is designed to be a drop-in replacement
-  for the GNU linkers for linking user-land programs. If your user-land program
-  cannot be built due to missing command-line options, please file a bug at
-  <a class="Lk" title="Lk" href="https://github.com/rui314/mold/issues">https://github.com/rui314/mold/issues</a>.
-<div class="Pp"></div>
-<code class="Nm" title="Nm">mold</code> supports a very limited set of linker
-  script features, which is just sufficient to read
-  <span class="Pa" title="Pa">/usr/lib/x86_64-linux-gnu/libc.so</span> on Linux
-  systems (on Linux, that file is despite its name not a shared library but an
-  ASCII linker script that loads a real
-  <span class="Pa" title="Pa">libc.so</span> file.) Beyond that, we have no plan
-  to support any linker script features. The linker script is an ad-hoc,
-  over-designed, complex language which we believe needs to be disrupted by a
-  simpler mechanism. We have a plan to add a replacement for the linker script
-  to <code class="Nm" title="Nm">mold</code> instead.
-<h2 class="Ss" title="Ss" id="Archive_symbol_resolution"><a class="permalink" href="#Archive_symbol_resolution">Archive
+</section>
+<section class="Sh">
+<h1 class="Sh" id="DESCRIPTION"><a class="permalink" href="#DESCRIPTION">DESCRIPTION</a></h1>
+<p class="Pp"><code class="Nm">mold</code> is a faster drop-in replacement for
+    the default GNU <a class="Xr">ld(1)</a>.</p>
+<section class="Ss">
+<h2 class="Ss" id="How_to_use_mold"><a class="permalink" href="#How_to_use_mold">How
+  to use <code class="Nm">mold</code></a></h2>
+<p class="Pp">See
+    <a class="Lk" href="https://github.com/rui314/mold#how-to-use">https://github.com/rui314/mold#how-to-use</a>.</p>
+</section>
+<section class="Ss">
+<h2 class="Ss" id="Compatibility"><a class="permalink" href="#Compatibility">Compatibility</a></h2>
+<p class="Pp"><code class="Nm">mold</code> is designed to be a drop-in
+    replacement for the GNU linkers for linking user-land programs. If your
+    user-land program cannot be built due to missing command-line options,
+    please file a bug at
+    <a class="Lk" href="https://github.com/rui314/mold/issues">https://github.com/rui314/mold/issues</a>.</p>
+<p class="Pp"><code class="Nm">mold</code> supports a very limited set of linker
+    script features, which is just sufficient to read
+    <span class="Pa">/usr/lib/x86_64-linux-gnu/libc.so</span> on Linux systems
+    (on Linux, that file is despite its name not a shared library but an ASCII
+    linker script that loads a real <span class="Pa">libc.so</span> file.)
+    Beyond that, we have no plan to support any linker script features. The
+    linker script is an ad-hoc, over-designed, complex language which we believe
+    needs to be disrupted by a simpler mechanism. We have a plan to add a
+    replacement for the linker script to <code class="Nm">mold</code>
+  instead.</p>
+</section>
+<section class="Ss">
+<h2 class="Ss" id="Archive_symbol_resolution"><a class="permalink" href="#Archive_symbol_resolution">Archive
   symbol resolution</a></h2>
-Traditionally, Unix linkers are sensitive to the order in which input files
-  appear on command line. They process input files from the first (left-most)
-  file to the last (right-most) file one-by-one. While reading input files, they
-  maintain sets of defined and undefined symbols. When visiting an archive file
-  (<code class="Li">.a</code> files), they pull out object files to resolve as
-  many undefined symbols as possible and go on to the next input file. Object
-  files that weren't pulled out will never have a chance for a second look.
-<div class="Pp"></div>
-Due to this semantics, you usually have to add archive files at the end of a
-  command line, so that when a linker reaches archive files, it knows what
-  symbols are remain undefined. If you put archive files at the beginning of a
-  command line, a linker doesn't have any undefined symbol, and thus no object
-  files will be pulled out from archives.
-<div class="Pp"></div>
-You can change the processing order by
-  <code class="Fl" title="Fl">--start-group</code> and
-  <code class="Fl" title="Fl">--end-group</code> options, though they make a
-  linker slower.
-<div class="Pp"></div>
-<code class="Nm" title="Nm">mold</code> as well as LLVM
-  <a class="Xr" title="Xr">lld(1)</a> linker take a different approach. They
-  memorize what symbols can be resolved from archive files instead of forgetting
-  it after processing each archive. Therefore,
-  <code class="Nm" title="Nm">mold</code> and
-  <a class="Xr" title="Xr">lld(1)</a> can &quot;go back&quot; in a command line
-  to pull out object files from archives, if they are needed to resolve
-  remaining undefined symbols. They are not sensitive to the input file order.
-<div class="Pp"></div>
-<code class="Fl" title="Fl">--start-group</code> and
-  <code class="Fl" title="Fl">--end-group</code> are still accepted by
-  <code class="Nm" title="Nm">mold</code> and
-  <a class="Xr" title="Xr">lld(1)</a> for compatibility with traditional
-  linkers, but they are silently ignored.
-<h2 class="Ss" title="Ss" id="Dynamic_symbol_resolution"><a class="permalink" href="#Dynamic_symbol_resolution">Dynamic
+<p class="Pp">Traditionally, Unix linkers are sensitive to the order in which
+    input files appear on command line. They process input files from the first
+    (left-most) file to the last (right-most) file one-by-one. While reading
+    input files, they maintain sets of defined and undefined symbols. When
+    visiting an archive file (<code class="Li">.a</code> files), they pull out
+    object files to resolve as many undefined symbols as possible and go on to
+    the next input file. Object files that weren't pulled out will never have a
+    chance for a second look.</p>
+<p class="Pp">Due to this semantics, you usually have to add archive files at
+    the end of a command line, so that when a linker reaches archive files, it
+    knows what symbols are remain undefined. If you put archive files at the
+    beginning of a command line, a linker doesn't have any undefined symbol, and
+    thus no object files will be pulled out from archives.</p>
+<p class="Pp">You can change the processing order by
+    <code class="Fl">--start-group</code> and
+    <code class="Fl">--end-group</code> options, though they make a linker
+    slower.</p>
+<p class="Pp"><code class="Nm">mold</code> as well as LLVM
+    <a class="Xr">lld(1)</a> linker take a different approach. They memorize
+    what symbols can be resolved from archive files instead of forgetting it
+    after processing each archive. Therefore, <code class="Nm">mold</code> and
+    <a class="Xr">lld(1)</a> can &quot;go back&quot; in a command line to pull
+    out object files from archives, if they are needed to resolve remaining
+    undefined symbols. They are not sensitive to the input file order.</p>
+<p class="Pp"><code class="Fl">--start-group</code> and
+    <code class="Fl">--end-group</code> are still accepted by
+    <code class="Nm">mold</code> and <a class="Xr">lld(1)</a> for compatibility
+    with traditional linkers, but they are silently ignored.</p>
+</section>
+<section class="Ss">
+<h2 class="Ss" id="Dynamic_symbol_resolution"><a class="permalink" href="#Dynamic_symbol_resolution">Dynamic
   symbol resolution</a></h2>
-Some Unix linker features are unable to be understood without understanding the
-  semantics of dynamic symbol resolution. Therefore, even though that's not
-  specific to <code class="Nm" title="Nm">mold</code>, we'll explain it here.
-<div class="Pp"></div>
-We use &quot;ELF module&quot; or just &quot;module&quot; as a collective term to
-  refer an executable or a shared library file in the ELF format.
-<div class="Pp"></div>
-An ELF module may have lists of imported symbols and exported symbols, as well
-  as a list of shared library names from which imported symbols should be
-  imported. The point is that imported symbols are not bound to any specific
-  shared library until runtime.
-<div class="Pp"></div>
-Here is how the Unix dynamic linker resolves dynamic symbols. Upon the start of
-  an ELF program, the dynamic linker construct a list of ELF modules which as a
-  whole consist of a complete program. The executable file is always at the
-  beginning of the list followed by its depending shared libraries. An imported
-  symbol is searched from the beginning of the list to the end. If two or more
-  modules define the same symbol, the one that appears first in the list takes
-  precedence over the others.
-<div class="Pp"></div>
-This Unix semantics are contrary to systems such as Windows that have the
-  two-level namespace for dynamic symbols. On Windows, for example, dynamic
-  symbols are represented as a tuple of
-  (<b class="Sy" title="Sy">symbol-name</b>,
-  <b class="Sy" title="Sy">shared-library-name</b>), so that each dynamic symbol
-  is guaranteed to be resolved from some specific library.
-<div class="Pp"></div>
-Typically, an ELF module that exports a symbol also imports the same symbol.
-  Such a symbol is usually resolved to itself, but that's not the case if a
-  module that appears before in the symbol search list provides another
-  definition of the same symbol.
-<div class="Pp"></div>
-Let me take <a class="Xr" title="Xr">malloc(3)</a> as an example. Assume that
-  you define your version of <a class="Xr" title="Xr">malloc(3)</a> in your main
-  executable file. Then, all <b class="Sy" title="Sy">malloc</b> calls from any
-  module are resolved to your function instead of that in libc, because the
-  executable is always at the beginning of the dynamic symbol search list. Note
-  that even <a class="Xr" title="Xr">malloc(3)</a> calls within libc are
-  resolved to your definition since libc exports and imports
-  <b class="Sy" title="Sy">malloc</b>. Therefore, by defining
-  <b class="Sy" title="Sy">malloc</b> yourself, you can overwrite a library
-  function, and the <a class="Xr" title="Xr">malloc(3)</a> in libc becomes dead
-  code.
-<div class="Pp"></div>
-These Unix semantics are tricky and sometimes considered harmful. For example,
-  assume that you accidentally define <a class="Xr" title="Xr">atoi(3)</a> as a
-  global function in your executable that behaves completely differently from
-  the one in the C standard. Then, all <b class="Sy" title="Sy">atoi</b>
-  function calls from any modules (even function calls within libc) are
-  redirected to your function instead of the one in libc which obviously causes
-  a problem. That is a somewhat surprising consequence for an accidental name
-  conflict. On the other hand, this semantic is sometimes considered useful
-  because it allows users to overwrite library functions without recompiling
-  modules containing them. Whether good or bad, you should keep this semantic in
-  mind to understand the Unix linkers behaviors.
-<h2 class="Ss" title="Ss" id="Build_reproducibility"><a class="permalink" href="#Build_reproducibility">Build
+<p class="Pp">Some Unix linker features are unable to be understood without
+    understanding the semantics of dynamic symbol resolution. Therefore, even
+    though that's not specific to <code class="Nm">mold</code>, we'll explain it
+    here.</p>
+<p class="Pp">We use &quot;ELF module&quot; or just &quot;module&quot; as a
+    collective term to refer an executable or a shared library file in the ELF
+    format.</p>
+<p class="Pp">An ELF module may have lists of imported symbols and exported
+    symbols, as well as a list of shared library names from which imported
+    symbols should be imported. The point is that imported symbols are not bound
+    to any specific shared library until runtime.</p>
+<p class="Pp">Here is how the Unix dynamic linker resolves dynamic symbols. Upon
+    the start of an ELF program, the dynamic linker construct a list of ELF
+    modules which as a whole consist of a complete program. The executable file
+    is always at the beginning of the list followed by its depending shared
+    libraries. An imported symbol is searched from the beginning of the list to
+    the end. If two or more modules define the same symbol, the one that appears
+    first in the list takes precedence over the others.</p>
+<p class="Pp" id="symbol-name">This Unix semantics are contrary to systems such
+    as Windows that have the two-level namespace for dynamic symbols. On
+    Windows, for example, dynamic symbols are represented as a tuple of
+    (<a class="permalink" href="#symbol-name"><b class="Sy">symbol-name</b></a>,
+    <a class="permalink" href="#shared-library-name"><b class="Sy" id="shared-library-name">shared-library-name</b></a>),
+    so that each dynamic symbol is guaranteed to be resolved from some specific
+    library.</p>
+<p class="Pp">Typically, an ELF module that exports a symbol also imports the
+    same symbol. Such a symbol is usually resolved to itself, but that's not the
+    case if a module that appears before in the symbol search list provides
+    another definition of the same symbol.</p>
+<p class="Pp">Let me take <a class="Xr">malloc(3)</a> as an example. Assume that
+    you define your version of <a class="Xr">malloc(3)</a> in your main
+    executable file. Then, all <b class="Sy">malloc</b> calls from any module
+    are resolved to your function instead of that in libc, because the
+    executable is always at the beginning of the dynamic symbol search list.
+    Note that even <a class="Xr">malloc(3)</a> calls within libc are resolved to
+    your definition since libc exports and imports <b class="Sy">malloc</b>.
+    Therefore, by defining <b class="Sy">malloc</b> yourself, you can overwrite
+    a library function, and the <a class="Xr">malloc(3)</a> in libc becomes dead
+    code.</p>
+<p class="Pp" id="atoi">These Unix semantics are tricky and sometimes considered
+    harmful. For example, assume that you accidentally define
+    <a class="Xr">atoi(3)</a> as a global function in your executable that
+    behaves completely differently from the one in the C standard. Then, all
+    <a class="permalink" href="#atoi"><b class="Sy">atoi</b></a> function calls
+    from any modules (even function calls within libc) are redirected to your
+    function instead of the one in libc which obviously causes a problem. That
+    is a somewhat surprising consequence for an accidental name conflict. On the
+    other hand, this semantic is sometimes considered useful because it allows
+    users to overwrite library functions without recompiling modules containing
+    them. Whether good or bad, you should keep this semantic in mind to
+    understand the Unix linkers behaviors.</p>
+</section>
+<section class="Ss">
+<h2 class="Ss" id="Build_reproducibility"><a class="permalink" href="#Build_reproducibility">Build
   reproducibility</a></h2>
-<code class="Nm" title="Nm">mold</code>'s output is deterministic. That is, if
-  you pass the same object files and the same command-line options to the same
-  version of <code class="Nm" title="Nm">mold</code>, it is guaranteed to always
-  produce the same output. The linker's internal randomness, such as the timing
-  of thread scheduling or iteration orders of hash tables, doesn't affect the
-  output.
-<div class="Pp"></div>
-<code class="Nm" title="Nm">mold</code> does not have any host-specific default
-  settings. This is contrary to the GNU linkers to which some configurable
-  values, such as system-dependent library search paths, are hard-coded.
-  <code class="Nm" title="Nm">mold</code> depends only on its command-line
-  arguments.
-<h1 class="Sh" title="Sh" id="OPTIONS"><a class="permalink" href="#OPTIONS">OPTIONS</a></h1>
-<dl class="Bl-tag">
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-help"><code class="Fl" title="Fl" id="-help">--help</code></a></dt>
-  <dd>Report usage information to stdout and exit.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#v"><code class="Fl" title="Fl" id="v">-v</code></a>,
-    <code class="Fl" title="Fl">--version</code></dt>
-  <dd>Report version information to stdout.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#V"><code class="Fl" title="Fl" id="V">-V</code></a></dt>
-  <dd>Report version and target information to stdout.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#C"><code class="Fl" title="Fl" id="C">-C</code></a>
-    <var class="Ar" title="Ar">dir</var>,
-    <code class="Fl" title="Fl">--directory</code>
-    <var class="Ar" title="Ar">dir</var></dt>
-  <dd>Change to <var class="Ar" title="Ar">dir</var> before doing anything.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#E"><code class="Fl" title="Fl" id="E">-E</code></a>,
-    <code class="Fl" title="Fl">--export-dynamic</code>,
-    <code class="Fl" title="Fl">--no-export-dynamic</code></dt>
-  <dd>When creating an executable, using the
-      <code class="Fl" title="Fl">-E</code> option causes all global symbols to
-      be put into the dynamic symbol table, so that the symbols are visible from
-      other ELF modules at runtime.
-    <div class="Pp"></div>
-    By default, or if <code class="Fl" title="Fl">--no-export-dynamic</code> is
-      given, only symbols that are referenced by DSOs at link-time are exported
-      from an executable.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#F"><code class="Fl" title="Fl" id="F">-F</code></a>
-    <var class="Ar" title="Ar">libname</var>,
-    <code class="Fl" title="Fl">--filter</code>=<var class="Ar" title="Ar">libname</var></dt>
-  <dd>Set the <code class="Dv" title="Dv">DT_FILTER</code> dynamic section field
-      to <var class="Ar" title="Ar">libname</var>.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#I"><code class="Fl" title="Fl" id="I">-I</code></a><var class="Ar" title="Ar">file</var>,
-    <code class="Fl" title="Fl">--dynamic-linker</code>=<var class="Ar" title="Ar">file</var>,
-    <code class="Fl" title="Fl">--no-dynamic-linker</code></dt>
-  <dd>Set the dynamic linker path to <var class="Ar" title="Ar">file</var>. If
-      no <code class="Fl" title="Fl">-I</code> option is given, or if
-      <code class="Fl" title="Fl">--no-dynamic-linker</code> is given, no
-      dynamic linker path is set to an output file. This is contrary to the GNU
-      linkers which sets a default dynamic linker path in that case. However,
-      this difference doesn't usually make any difference because the compiler
-      driver always passes <code class="Fl" title="Fl">-I</code> to a
-    linker.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#L"><code class="Fl" title="Fl" id="L">-L</code></a><var class="Ar" title="Ar">dir</var>,
-    <code class="Fl" title="Fl">--library-path</code>=<var class="Ar" title="Ar">dir</var></dt>
-  <dd>Add <var class="Ar" title="Ar">dir</var> to the list of library search
-      paths from which <code class="Nm" title="Nm">mold</code> searches
-      libraries for the <b>-l</b> option.
-    <div class="Pp"></div>
-    Unlike the GNU linkers, <code class="Nm" title="Nm">mold</code> does not
-      have the default search paths. This difference doesn't usually make any
-      difference because the compiler driver always passes all necessary search
-      paths to a linker.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#M"><code class="Fl" title="Fl" id="M">-M</code></a>,
-    <code class="Fl" title="Fl">--print-map</code></dt>
-  <dd>Write a map file to stdout.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#N"><code class="Fl" title="Fl" id="N">-N</code></a>,
-    <code class="Fl" title="Fl">--omagic</code>,
-    <code class="Fl" title="Fl">--no-omagic</code></dt>
-  <dd>Force <code class="Nm" title="Nm">mold</code> to emit an output file with
-      an old-fashioned memory layout. First, it makes the first data segment to
-      not be aligned to a page boundary. Second, text segments are marked as
-      writable if the option is given.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#S"><code class="Fl" title="Fl" id="S">-S</code></a>,
-    <code class="Fl" title="Fl">--strip-debug</code></dt>
-  <dd>Omit <code class="Li">.debug_*</code> sections from the output file.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#T"><code class="Fl" title="Fl" id="T">-T</code></a>
-    <var class="Ar" title="Ar">file</var>,
-    <code class="Fl" title="Fl">--script</code>=<var class="Ar" title="Ar">file</var></dt>
-  <dd>Read linker script from <var class="Ar" title="Ar">file</var>.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#X"><code class="Fl" title="Fl" id="X">-X</code></a>,
-    <code class="Fl" title="Fl">--discard-locals</code></dt>
+<p class="Pp"><code class="Nm">mold</code>'s output is deterministic. That is,
+    if you pass the same object files and the same command-line options to the
+    same version of <code class="Nm">mold</code>, it is guaranteed to always
+    produce the same output. The linker's internal randomness, such as the
+    timing of thread scheduling or iteration orders of hash tables, doesn't
+    affect the output.</p>
+<p class="Pp"><code class="Nm">mold</code> does not have any host-specific
+    default settings. This is contrary to the GNU linkers to which some
+    configurable values, such as system-dependent library search paths, are
+    hard-coded. <code class="Nm">mold</code> depends only on its command-line
+    arguments.</p>
+</section>
+</section>
+<section class="Sh">
+<h1 class="Sh" id="OPTIONS"><a class="permalink" href="#OPTIONS">OPTIONS</a></h1>
+<dl class="Bl-tag Bl-compact">
+  <dt id="help"><a class="permalink" href="#help"><code class="Fl">--help</code></a></dt>
+  <dd>Report usage information to stdout and exit.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="v"><a class="permalink" href="#v"><code class="Fl">-v</code></a>,
+    <code class="Fl">--version</code></dt>
+  <dd>Report version information to stdout.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="V"><a class="permalink" href="#V"><code class="Fl">-V</code></a></dt>
+  <dd>Report version and target information to stdout.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="C"><a class="permalink" href="#C"><code class="Fl">-C</code></a>
+    <var class="Ar">dir</var>, <code class="Fl">--directory</code>
+    <var class="Ar">dir</var></dt>
+  <dd>Change to <var class="Ar">dir</var> before doing anything.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="E"><a class="permalink" href="#E"><code class="Fl">-E</code></a>,
+    <code class="Fl">--export-dynamic</code></dt>
+  <dd style="width: auto;">&#x00A0;</dd>
+  <dt id="no-export-dynamic"><a class="permalink" href="#no-export-dynamic"><code class="Fl">--no-export-dynamic</code></a></dt>
+  <dd>When creating an executable, using the <code class="Fl">-E</code> option
+      causes all global symbols to be put into the dynamic symbol table, so that
+      the symbols are visible from other ELF modules at runtime.
+    <p class="Pp">By default, or if <code class="Fl">--no-export-dynamic</code>
+        is given, only symbols that are referenced by DSOs at link-time are
+        exported from an executable.</p>
+    <p class="Pp"></p>
+  </dd>
+  <dt id="F"><a class="permalink" href="#F"><code class="Fl">-F</code></a>
+    <var class="Ar">libname</var>,
+    <code class="Fl">--filter</code>=<var class="Ar">libname</var></dt>
+  <dd>Set the <code class="Dv">DT_FILTER</code> dynamic section field to
+      <var class="Ar">libname</var>.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="I"><a class="permalink" href="#I"><code class="Fl">-I</code></a><var class="Ar">file</var>,
+    <code class="Fl">--dynamic-linker</code>=<var class="Ar">file</var></dt>
+  <dd style="width: auto;">&#x00A0;</dd>
+  <dt id="no-dynamic-linker"><a class="permalink" href="#no-dynamic-linker"><code class="Fl">--no-dynamic-linker</code></a></dt>
+  <dd>Set the dynamic linker path to <var class="Ar">file</var>. If no
+      <code class="Fl">-I</code> option is given, or if
+      <code class="Fl">--no-dynamic-linker</code> is given, no dynamic linker
+      path is set to an output file. This is contrary to the GNU linkers which
+      sets a default dynamic linker path in that case. However, this difference
+      doesn't usually make any difference because the compiler driver always
+      passes <code class="Fl">-I</code> to a linker.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="L"><a class="permalink" href="#L"><code class="Fl">-L</code></a><var class="Ar">dir</var>,
+    <code class="Fl">--library-path</code>=<var class="Ar">dir</var></dt>
+  <dd>Add <var class="Ar">dir</var> to the list of library search paths from
+      which <code class="Nm">mold</code> searches libraries for the <b>-l</b>
+      option.
+    <p class="Pp">Unlike the GNU linkers, <code class="Nm">mold</code> does not
+        have the default search paths. This difference doesn't usually make any
+        difference because the compiler driver always passes all necessary
+        search paths to a linker.</p>
+    <p class="Pp"></p>
+  </dd>
+  <dt id="M"><a class="permalink" href="#M"><code class="Fl">-M</code></a>,
+    <code class="Fl">--print-map</code></dt>
+  <dd>Write a map file to stdout.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="N"><a class="permalink" href="#N"><code class="Fl">-N</code></a>,
+    <code class="Fl">--omagic</code></dt>
+  <dd style="width: auto;">&#x00A0;</dd>
+  <dt id="no-omagic"><a class="permalink" href="#no-omagic"><code class="Fl">--no-omagic</code></a></dt>
+  <dd>Force <code class="Nm">mold</code> to emit an output file with an
+      old-fashioned memory layout. First, it makes the first data segment to not
+      be aligned to a page boundary. Second, text segments are marked as
+      writable if the option is given.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="S"><a class="permalink" href="#S"><code class="Fl">-S</code></a>,
+    <code class="Fl">--strip-debug</code></dt>
+  <dd>Omit <code class="Li">.debug_*</code> sections from the output file.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="T"><a class="permalink" href="#T"><code class="Fl">-T</code></a>
+    <var class="Ar">file</var>,
+    <code class="Fl">--script</code>=<var class="Ar">file</var></dt>
+  <dd>Read linker script from <var class="Ar">file</var>.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="X"><a class="permalink" href="#X"><code class="Fl">-X</code></a>,
+    <code class="Fl">--discard-locals</code></dt>
   <dd>Discard temporary local symbols to reduce the sizes of the symbol table
       and the string table. Temporary local symbols are local symbols starting
       with <code class="Li">.L</code>. Compilers usually generate such symbols
       for unnamed program elements such as string literals or floating-point
-      literals.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#e"><code class="Fl" title="Fl" id="e">-e</code></a>
-    <var class="Ar" title="Ar">symbol</var>,
-    <code class="Fl" title="Fl">--entry</code>=<var class="Ar" title="Ar">symbol</var></dt>
-  <dd>Use <var class="Ar" title="Ar">symbol</var> as the entry point symbol
-      instead of the default entry point symbol
-      <b class="Sy" title="Sy">_start</b>.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#f"><code class="Fl" title="Fl" id="f">-f</code></a>
-    <var class="Ar" title="Ar">shlib</var>,
-    <code class="Fl" title="Fl">--auxiliary</code>=<var class="Ar" title="Ar">shlib</var></dt>
-  <dd>Set the <code class="Dv" title="Dv">DT_AUXILIARY</code> dynamic section
-      field to <var class="Ar" title="Ar">shlib</var>.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#h"><code class="Fl" title="Fl" id="h">-h</code></a>
-    <var class="Ar" title="Ar">libname</var>,
-    <code class="Fl" title="Fl">--soname</code><var class="Ar" title="Ar">libname</var></dt>
-  <dd>Set the <code class="Dv" title="Dv">DT_SONAME</code> dynamic section field
-      to <var class="Ar" title="Ar">libname</var>. This option is used when
-      creating a shared object file. Typically, when you create Sylib
-      <var class="Ar" title="Ar">foo</var><b class="Sy" title="Sy">.so</b>, you
-      want to pass
-      <code class="Fl" title="Fl">--soname</code>=<var class="Ar" title="Ar">foo</var>
-      to a linker.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#l"><code class="Fl" title="Fl" id="l">-l</code></a><var class="Ar" title="Ar">libname</var></dt>
-  <dd>Search for Sylib
-      <var class="Ar" title="Ar">libname</var><b class="Sy" title="Sy">.so</b>
-      or Sylib
-      <var class="Ar" title="Ar">libname</var><b class="Sy" title="Sy">.a</b>
-      from library search paths.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#m"><code class="Fl" title="Fl" id="m">-m</code></a>
-    [<div class="Op"><b class="Sy" title="Sy">elf_x86_64</b> |
-    <b class="Sy" title="Sy">elf_i386</b></div>]</dt>
-  <dd>Choose a target.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#o"><code class="Fl" title="Fl" id="o">-o</code></a>
-    <var class="Ar" title="Ar">file</var>,
-    <code class="Fl" title="Fl">--output</code>=<var class="Ar" title="Ar">file</var></dt>
-  <dd>Use <var class="Ar" title="Ar">file</var> as the output file name instead
-      of the default name <b class="Sy" title="Sy">a.out</b>.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#r"><code class="Fl" title="Fl" id="r">-r</code></a>,
-    <code class="Fl" title="Fl">--relocatable</code></dt>
+      literals.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="e"><a class="permalink" href="#e"><code class="Fl">-e</code></a>
+    <var class="Ar">symbol</var>,
+    <code class="Fl">--entry</code>=<var class="Ar">symbol</var></dt>
+  <dd>Use <var class="Ar">symbol</var> as the entry point symbol instead of the
+      default entry point symbol
+      <a class="permalink" href="#_start"><b class="Sy" id="_start">_start</b></a>.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="f"><a class="permalink" href="#f"><code class="Fl">-f</code></a>
+    <var class="Ar">shlib</var>,
+    <code class="Fl">--auxiliary</code>=<var class="Ar">shlib</var></dt>
+  <dd>Set the <code class="Dv">DT_AUXILIARY</code> dynamic section field to
+      <var class="Ar">shlib</var>.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="h"><a class="permalink" href="#h"><code class="Fl">-h</code></a>
+    <var class="Ar">libname</var>,
+    <code class="Fl">--soname</code>=<var class="Ar">libname</var></dt>
+  <dd>Set the <code class="Dv">DT_SONAME</code> dynamic section field to
+      <var class="Ar">libname</var>. This option is used when creating a shared
+      object file. Typically, when you create SyXXX lib
+      <var class="Ar">foo</var><a class="permalink" href="#.so"><b class="Sy" id=".so">.so</b></a>,
+      you want to pass
+      <code class="Fl">--soname</code>=<var class="Ar">foo</var> to a linker.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="l"><a class="permalink" href="#l"><code class="Fl">-l</code></a><var class="Ar">libname</var></dt>
+  <dd>Search for Sylib <var class="Ar">libname</var><b class="Sy">.so</b> or
+      Sylib <var class="Ar">libname</var><b class="Sy">.a</b> from library
+      search paths.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="m"><a class="permalink" href="#m"><code class="Fl">-m</code></a>
+    [<a class="permalink" href="#elf_x86_64"><b class="Sy" id="elf_x86_64">elf_x86_64</b></a>
+    |
+    <a class="permalink" href="#elf_i386"><b class="Sy" id="elf_i386">elf_i386</b></a>
+    |
+    <a class="permalink" href="#aarch64linux"><b class="Sy" id="aarch64linux">aarch64linux</b></a>]</dt>
+  <dd>Choose a target.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="o"><a class="permalink" href="#o"><code class="Fl">-o</code></a>
+    <var class="Ar">file</var>,
+    <code class="Fl">--output</code>=<var class="Ar">file</var></dt>
+  <dd>Use <var class="Ar">file</var> as the output file name instead of the
+      default name
+      <a class="permalink" href="#a.out"><b class="Sy" id="a.out">a.out</b></a>.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="r"><a class="permalink" href="#r"><code class="Fl">-r</code></a>,
+    <code class="Fl">--relocatable</code></dt>
   <dd>Instead of generating an executable or a shared object file, combine input
       object files to generate another object file that can be used as an input
-      to a linker.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#s"><code class="Fl" title="Fl" id="s">-s</code></a>,
-    <code class="Fl" title="Fl">-FL</code>
-    <code class="Fl" title="Fl">--strip-all</code></dt>
-  <dd>Omit <code class="Li">.symtab</code> section from the output file.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#u"><code class="Fl" title="Fl" id="u">-u</code></a>
-    <var class="Ar" title="Ar">symbol</var>,
-    <code class="Fl" title="Fl">--undefined</code>=<var class="Ar" title="Ar">symbol</var></dt>
-  <dd>If <var class="Ar" title="Ar">symbol</var> remains as an undefined symbol
-      after reading all object files, and if there is an static archive that
-      contains an object file defining <var class="Ar" title="Ar">symbol</var>,
-      pull out the object file and link it so that the output file contains a
-      definition of <var class="Ar" title="Ar">symbol</var>.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-Bdynamic"><code class="Fl" title="Fl" id="-Bdynamic">--Bdynamic</code></a></dt>
-  <dd>Link against shared libraries.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-Bstatic"><code class="Fl" title="Fl" id="-Bstatic">--Bstatic</code></a></dt>
-  <dd>Do not link against shared libraries.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-Bsymbolic"><code class="Fl" title="Fl" id="-Bsymbolic">--Bsymbolic</code></a></dt>
+      to a linker.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="s"><a class="permalink" href="#s"><code class="Fl">-s</code></a>,
+    <code class="Fl">--strip-all</code></dt>
+  <dd>Omit <code class="Li">.symtab</code> section from the output file.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="u"><a class="permalink" href="#u"><code class="Fl">-u</code></a>
+    <var class="Ar">symbol</var>,
+    <code class="Fl">--undefined</code>=<var class="Ar">symbol</var></dt>
+  <dd>If <var class="Ar">symbol</var> remains as an undefined symbol after
+      reading all object files, and if there is an static archive that contains
+      an object file defining <var class="Ar">symbol</var>, pull out the object
+      file and link it so that the output file contains a definition of
+      <var class="Ar">symbol</var>.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="Bdynamic"><a class="permalink" href="#Bdynamic"><code class="Fl">--Bdynamic</code></a></dt>
+  <dd>Link against shared libraries.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="Bstatic"><a class="permalink" href="#Bstatic"><code class="Fl">--Bstatic</code></a></dt>
+  <dd>Do not link against shared libraries.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="Bsymbolic"><a class="permalink" href="#Bsymbolic"><code class="Fl">--Bsymbolic</code></a></dt>
   <dd>When creating a shared library, make global symbols export-only (i.e. do
       not import the same symbol). As a result, references within a shared
       library is always resolved locally, negating symbol override at runtime.
-      See <a class="Sx" title="Sx" href="#Dynamic_symbol_resolution">Dynamic
-      symbol resolution</a> for more information about symbol imports and
-      exports.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-Bsymbolic-functions"><code class="Fl" title="Fl" id="-Bsymbolic-functions">--Bsymbolic-functions</code></a></dt>
-  <dd>Have the same effect as <code class="Fl" title="Fl">--Bsymbolic</code> but
-      works only for function symbols. Data symbols remains both imported and
-      exported.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-Bno-symbolic"><code class="Fl" title="Fl" id="-Bno-symbolic">--Bno-symbolic</code></a></dt>
-  <dd>Cancel <code class="Fl" title="Fl">--Bsymbolic</code> and
-      <code class="Fl" title="Fl">--Bsymbolic-functions</code>.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-Map"><code class="Fl" title="Fl" id="-Map">--Map</code></a>=<var class="Ar" title="Ar">file</var></dt>
-  <dd>Write map file to <var class="Ar" title="Ar">file</var>.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-allow-multiple-definition"><code class="Fl" title="Fl" id="-allow-multiple-definition">--allow-multiple-definition</code></a></dt>
+      See <a class="Sx" href="#Dynamic_symbol_resolution">Dynamic symbol
+      resolution</a> for more information about symbol imports and exports.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="Bsymbolic-functions"><a class="permalink" href="#Bsymbolic-functions"><code class="Fl">--Bsymbolic-functions</code></a></dt>
+  <dd>Have the same effect as <code class="Fl">--Bsymbolic</code> but works only
+      for function symbols. Data symbols remains being both imported and
+      exported.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="Bno-symbolic"><a class="permalink" href="#Bno-symbolic"><code class="Fl">--Bno-symbolic</code></a></dt>
+  <dd>Cancel <code class="Fl">--Bsymbolic</code> and
+      <code class="Fl">--Bsymbolic-functions</code>.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="Map"><a class="permalink" href="#Map"><code class="Fl">--Map</code></a>=<var class="Ar">file</var></dt>
+  <dd>Write map file to <var class="Ar">file</var>.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="Tbss"><a class="permalink" href="#Tbss"><code class="Fl">--Tbss</code></a>=<var class="Ar">address</var></dt>
+  <dd>Alias for
+      <code class="Fl">--section-start=.bss</code>=<var class="Ar">address</var>.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="Tdata"><a class="permalink" href="#Tdata"><code class="Fl">--Tdata</code></a>=<var class="Ar">address</var></dt>
+  <dd>Alias for
+      <code class="Fl">--section-start=.data</code>=<var class="Ar">address</var>.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="Ttext"><a class="permalink" href="#Ttext"><code class="Fl">--Ttext</code></a>=<var class="Ar">address</var></dt>
+  <dd>Alias for
+      <code class="Fl">--section-start=.text</code>=<var class="Ar">address</var>.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="allow-multiple-definition"><a class="permalink" href="#allow-multiple-definition"><code class="Fl">--allow-multiple-definition</code></a></dt>
   <dd>Normally, the linker reports an error if there are more than one
       definition of a symbol. This option changes the default behavior so that
       it doesn't report an error for duplicate definitions and instead use the
-      first definition.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-as-needed"><code class="Fl" title="Fl" id="-as-needed">--as-needed</code></a>,
-    <code class="Fl" title="Fl">--no-as-needed</code></dt>
+      first definition.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="as-needed"><a class="permalink" href="#as-needed"><code class="Fl">--as-needed</code></a></dt>
+  <dd style="width: auto;">&#x00A0;</dd>
+  <dt id="no-as-needed"><a class="permalink" href="#no-as-needed"><code class="Fl">--no-as-needed</code></a></dt>
   <dd>By default, shared libraries given to a linker are unconditionally added
       to the list of required libraries in an output file. However, shared
-      libraries after <code class="Fl" title="Fl">--as-needed</code> are added
-      to the list only when at least one symbol is actually used by an object
-      file. In other words, shared libraries after
-      <code class="Fl" title="Fl">--as-needed</code> are not added to the list
-      if they are not needed by a program.
-    <div class="Pp"></div>
-    The <code class="Fl" title="Fl">--no-as-needed</code> option restores the
-      default behavior for subsequent files.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-build-id"><code class="Fl" title="Fl" id="-build-id">--build-id</code></a>,
-    <code class="Fl" title="Fl">--no-build-id</code>,
-    <code class="Fl" title="Fl">--build-id</code>=[<div class="Op"><b class="Sy" title="Sy">none</b>
-    | <b class="Sy" title="Sy">md5</b> | <b class="Sy" title="Sy">sha1</b> |
-    <b class="Sy" title="Sy">sha256</b> | <b class="Sy" title="Sy">uuid</b> |
-    <b class="Sy" title="Sy">0x</b><var class="Ar" title="Ar">hexstring</var></div>]</dt>
+      libraries after <code class="Fl">--as-needed</code> are added to the list
+      only when at least one symbol is actually used by an object file. In other
+      words, shared libraries after <code class="Fl">--as-needed</code> are not
+      added to the list of needed libraries if they are not needed by a program.
+    <p class="Pp">The <code class="Fl">--no-as-needed</code> option restores the
+        default behavior for subsequent files.</p>
+    <p class="Pp"></p>
+  </dd>
+  <dt id="build-id"><a class="permalink" href="#build-id"><code class="Fl">--build-id</code></a></dt>
+  <dd style="width: auto;">&#x00A0;</dd>
+  <dt id="build-id~2"><a class="permalink" href="#build-id~2"><code class="Fl">--build-id</code></a>=[<b class="Sy">none</b>
+    | <b class="Sy">md5</b> | <b class="Sy">sha1</b> | <b class="Sy">sha256</b>
+    | <b class="Sy">uuid</b> |
+    <b class="Sy">0x</b><var class="Ar">hexstring</var>]</dt>
+  <dd style="width: auto;">&#x00A0;</dd>
+  <dt id="no-build-id"><a class="permalink" href="#no-build-id"><code class="Fl">--no-build-id</code></a></dt>
   <dd>Create a <code class="Li">.note.gnu.build-id</code> section containing a
       byte string to uniquely identify an output file.
-      <code class="Fl" title="Fl">--build-id</code> and
-      <code class="Fl" title="Fl">--build-id</code>=<b class="Sy" title="Sy">sha256</b>
-      compute a 256-bit cryptographic hash of an output file and set it to
-      build-id. <b class="Sy" title="Sy">md5</b> and
-      <b class="Sy" title="Sy">sha1</b> compute the same hash but truncate it to
-      128 and 160 bits, respectively, before setting it to build-id.
-      <b class="Sy" title="Sy">uuid</b> sets a random 128-bit UUID.
-      <b class="Sy" title="Sy">0x</b><var class="Ar" title="Ar">hexstring</var>
-      sets <var class="Ar" title="Ar">hexstring</var>.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-chroot"><code class="Fl" title="Fl" id="-chroot">--chroot</code></a>=<var class="Ar" title="Ar">dir</var></dt>
-  <dd>Set <var class="Ar" title="Ar">dir</var> to root directory.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-compress-debug-sections"><code class="Fl" title="Fl" id="-compress-debug-sections">--compress-debug-sections</code></a>=[<div class="Op"><b class="Sy" title="Sy">none</b>
-    | <b class="Sy" title="Sy">zlib</b> | <b class="Sy" title="Sy">zlib-gabi</b>
-    | <b class="Sy" title="Sy">zlib-gnu</b></div>]</dt>
-  <dd>Compress DWARF debug info (<b class="Sy" title="Sy">.debug_*</b> sections)
-      using the zlib compression algorithm.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-defsym"><code class="Fl" title="Fl" id="-defsym">--defsym</code></a>=<var class="Ar" title="Ar">symbol</var>=<var class="Ar" title="Ar">value</var></dt>
-  <dd>Define <var class="Ar" title="Ar">symbol</var> as an alias for
-      <var class="Ar" title="Ar">value</var>.
-    <div class="Pp"></div>
-    <var class="Ar" title="Ar">value</var> is either an integer (in decimal or
-      hexadecimal with &#x2018;0x&#x2019; prefix) or a symbol name. If an
-      integer is given as a value, <var class="Ar" title="Ar">symbol</var> is
-      defined as an absolute symbol with the given value.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-default-symver"><code class="Fl" title="Fl" id="-default-symver">--default-symver</code></a></dt>
-  <dd>Use soname as a symbol version and append that version to all
-    symbols.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-demangle"><code class="Fl" title="Fl" id="-demangle">--demangle</code></a>,
-    <code class="Fl" title="Fl">--no-demangle</code></dt>
-  <dd>Demangle C++ symbols in log messages.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-dynamic-list"><code class="Fl" title="Fl" id="-dynamic-list">--dynamic-list</code></a>=<var class="Ar" title="Ar">file</var></dt>
-  <dd>Read a list of dynamic symbols from
-    <var class="Ar" title="Ar">file</var>.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-eh-frame-hdr"><code class="Fl" title="Fl" id="-eh-frame-hdr">--eh-frame-hdr</code></a>,
-    <code class="Fl" title="Fl">--no-eh-frame-hdr</code></dt>
-  <dd>Create <code class="Li">.eh_frame_hdr</code> section.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-exclude-libs"><code class="Fl" title="Fl" id="-exclude-libs">--exclude-libs</code></a>=<var class="Ar" title="Ar">libraries</var>...</dt>
-  <dd>Mark all symbols in the given <var class="Ar" title="Ar">libraries</var>
-      hidden.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-fini"><code class="Fl" title="Fl" id="-fini">--fini</code></a>=<var class="Ar" title="Ar">symbol</var></dt>
-  <dd>Call <var class="Ar" title="Ar">symbol</var> at unload-time.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-fork"><code class="Fl" title="Fl" id="-fork">--fork</code></a>,
-    <code class="Fl" title="Fl">--no-fork</code></dt>
+      <code class="Fl">--build-id</code> and
+      <code class="Fl">--build-id</code>=<b class="Sy">sha256</b> compute a
+      256-bit cryptographic hash of an output file and set it to build-id.
+      <b class="Sy">md5</b> and <b class="Sy">sha1</b> compute the same hash but
+      truncate it to 128 and 160 bits, respectively, before setting it to
+      build-id. <b class="Sy">uuid</b> sets a random 128-bit UUID.
+      <b class="Sy">0x</b><var class="Ar">hexstring</var> sets
+      <var class="Ar">hexstring</var>.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="chroot"><a class="permalink" href="#chroot"><code class="Fl">--chroot</code></a>=<var class="Ar">dir</var></dt>
+  <dd>Set <var class="Ar">dir</var> to root directory.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="color-diagnostics"><a class="permalink" href="#color-diagnostics"><code class="Fl">--color-diagnostics</code></a>=[<a class="permalink" href="#auto"><b class="Sy" id="auto">auto</b></a>
+    |
+    <a class="permalink" href="#always"><b class="Sy" id="always">always</b></a>
+    |
+    <a class="permalink" href="#never"><b class="Sy" id="never">never</b></a>]</dt>
+  <dd style="width: auto;">&#x00A0;</dd>
+  <dt id="color-diagnostics~2"><a class="permalink" href="#color-diagnostics~2"><code class="Fl">--color-diagnostics</code></a></dt>
+  <dd style="width: auto;">&#x00A0;</dd>
+  <dt id="no-color-diagnostics"><a class="permalink" href="#no-color-diagnostics"><code class="Fl">--no-color-diagnostics</code></a></dt>
+  <dd>
+    <p class="Pp">Show diagnostics messages in color using ANSI escape
+        sequences. <var class="Ar">auto</var> means that
+        <code class="Nm">mold</code> prints out messages in color only if the
+        standard output is connected to a TTY. Default is
+        <var class="Ar">auto</var>.</p>
+    <p class="Pp"></p>
+  </dd>
+  <dt id="defsym"><a class="permalink" href="#defsym"><code class="Fl">--defsym</code></a>=<var class="Ar">symbol</var>=<var class="Ar">value</var></dt>
+  <dd>
+    <p class="Pp"></p>
+  </dd>
+  <dt id="compress-debug-sections"><a class="permalink" href="#compress-debug-sections"><code class="Fl">--compress-debug-sections</code></a>=[<b class="Sy">none</b>
+    | <a class="permalink" href="#zlib"><b class="Sy" id="zlib">zlib</b></a> |
+    <a class="permalink" href="#zlib-gabi"><b class="Sy" id="zlib-gabi">zlib-gabi</b></a>
+    |
+    <a class="permalink" href="#zlib-gnu"><b class="Sy" id="zlib-gnu">zlib-gnu</b></a>]</dt>
+  <dd>Compress DWARF debug info
+      (<a class="permalink" href="#.debug_*"><b class="Sy" id=".debug_*">.debug_*</b></a>
+      sections) using the zlib compression algorithm.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="defsym~2"><a class="permalink" href="#defsym~2"><code class="Fl">--defsym</code></a>=<var class="Ar">symbol</var>=<var class="Ar">value</var></dt>
+  <dd>Define <var class="Ar">symbol</var> as an alias for
+      <var class="Ar">value</var>.
+    <p class="Pp"><var class="Ar">value</var> is either an integer (in decimal
+        or hexadecimal with &#x2018;0x&#x2019; prefix) or a symbol name. If an
+        integer is given as a value, <var class="Ar">symbol</var> is defined as
+        an absolute symbol with the given value.</p>
+    <p class="Pp"></p>
+  </dd>
+  <dt id="default-symver"><a class="permalink" href="#default-symver"><code class="Fl">--default-symver</code></a></dt>
+  <dd>Use soname as a symbol version and append that version to all symbols.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="demangle"><a class="permalink" href="#demangle"><code class="Fl">--demangle</code></a></dt>
+  <dd style="width: auto;">&#x00A0;</dd>
+  <dt id="no-demangle"><a class="permalink" href="#no-demangle"><code class="Fl">--no-demangle</code></a></dt>
+  <dd>Demangle C++ symbols in log messages.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="dependency-file"><a class="permalink" href="#dependency-file"><code class="Fl">--dependency-file</code></a>=<var class="Ar">file</var></dt>
+  <dd>Write a dependency file to <var class="Ar">file</var>. The contents of the
+      written file is readable by <code class="Cm">make</code>, which defines
+      only one rule with the linker's output file as a target and all input
+      fiels as its prerequisite. Users are expected to include the generated
+      dependency file into a Makefile to automate the dependency management.
+      This option is analogous to the compiler's <code class="Fl">-MM</code>
+      <code class="Fl">-MF</code> options.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="dynamic-list"><a class="permalink" href="#dynamic-list"><code class="Fl">--dynamic-list</code></a>=<var class="Ar">file</var></dt>
+  <dd>Read a list of dynamic symbols from <var class="Ar">file</var>. Same as
+      <code class="Fl">--export-dynamic-symbol-list</code>, except that it
+      implies <code class="Fl">--Bsymbolic</code>.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="eh-frame-hdr"><a class="permalink" href="#eh-frame-hdr"><code class="Fl">--eh-frame-hdr</code></a></dt>
+  <dd style="width: auto;">&#x00A0;</dd>
+  <dt id="no-eh-frame-hdr"><a class="permalink" href="#no-eh-frame-hdr"><code class="Fl">--no-eh-frame-hdr</code></a></dt>
+  <dd>Create <code class="Li">.eh_frame_hdr</code> section.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="emit-relocs"><a class="permalink" href="#emit-relocs"><code class="Fl">--emit-relocs</code></a></dt>
+  <dd>A linker usually &quot;consumes&quot; relocation sections. That is, a
+      linker applies relocations to other sections, and relocation sections
+      themselves are discarded.
+    <p class="Pp">The <code class="Fl">--emit-relocs</code> instructs the linker
+        to leave relocation sections in the output file. Some post-link binary
+        analysis or optimization tools such as LLVM Bolt need them.</p>
+    <p class="Pp"><code class="Nm">mold</code> always creates RELA-type
+        relocation sections even if the native ELF format is REL-type so that it
+        is easy to read addends.</p>
+    <p class="Pp"></p>
+  </dd>
+  <dt id="enable-new-dtags"><a class="permalink" href="#enable-new-dtags"><code class="Fl">--enable-new-dtags</code></a></dt>
+  <dd style="width: auto;">&#x00A0;</dd>
+  <dt id="disable-new-dtags"><a class="permalink" href="#disable-new-dtags"><code class="Fl">--disable-new-dtags</code></a></dt>
+  <dd>By default, <code class="Nm">mold</code> emits DT_RUNPATH for
+      <code class="Fl">--rpath</code>. If you pass
+      <code class="Fl">--disable-new-dtags,</code> mold emits DT_RPATH for
+      <code class="Fl">--rpath</code> instead.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="exclude-libs"><a class="permalink" href="#exclude-libs"><code class="Fl">--exclude-libs</code></a>=<var class="Ar">libraries</var>...</dt>
+  <dd>Mark all symbols in the given <var class="Ar">libraries</var> hidden.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="export-dynamic-symbol"><a class="permalink" href="#export-dynamic-symbol"><code class="Fl">--export-dynamic-symbol</code></a>=<var class="Ar">sym</var></dt>
+  <dd>Put symbols matching <var class="Ar">sym</var> in the dynamic symbol
+      table. <var class="Ar">sym</var> may be a glob, with the same syntax as
+      the globs used in <code class="Fl">--export-dynamic-symbol-list</code> or
+      <code class="Fl">--version-script</code>.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="export-dynamic-symbol-list"><a class="permalink" href="#export-dynamic-symbol-list"><code class="Fl">--export-dynamic-symbol-list</code></a>=<var class="Ar">file</var></dt>
+  <dd>Read a list of dynamic symbols from <var class="Ar">file</var>.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="fatal-warnings"><a class="permalink" href="#fatal-warnings"><code class="Fl">--fatal-warnings</code></a></dt>
+  <dd style="width: auto;">&#x00A0;</dd>
+  <dt id="no-fatal-warnings"><a class="permalink" href="#no-fatal-warnings"><code class="Fl">--no-fatal-warnings</code></a></dt>
+  <dd>Treat warnings as errors.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="fini"><a class="permalink" href="#fini"><code class="Fl">--fini</code></a>=<var class="Ar">symbol</var></dt>
+  <dd>Call <var class="Ar">symbol</var> at unload-time.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="fork"><a class="permalink" href="#fork"><code class="Fl">--fork</code></a></dt>
+  <dd style="width: auto;">&#x00A0;</dd>
+  <dt id="no-fork"><a class="permalink" href="#no-fork"><code class="Fl">--no-fork</code></a></dt>
   <dd>Spawn a child process and let it do the actual linking. When linking a
       large program, the OS kernel can take a few hundred milliseconds to
-      terminate a <code class="Nm" title="Nm">mold</code> process.
-      <code class="Fl" title="Fl">--fork</code> hides that latency.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-gc-sections"><code class="Fl" title="Fl" id="-gc-sections">--gc-sections</code></a>,
-    <code class="Fl" title="Fl">--no-gc-sections</code></dt>
-  <dd>Remove unreferenced sections.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-hash-style"><code class="Fl" title="Fl" id="-hash-style">--hash-style</code></a>=[<div class="Op"><b class="Sy" title="Sy">sysv</b>
-    | <b class="Sy" title="Sy">gnu</b> |
-    <b class="Sy" title="Sy">both</b></div>]</dt>
-  <dd>Set hash style.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-icf"><code class="Fl" title="Fl" id="-icf">--icf</code></a>=<b class="Sy" title="Sy">all</b>,
-    <code class="Fl" title="Fl">--no-icf</code></dt>
-  <dd>Fold identical code.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-image-base"><code class="Fl" title="Fl" id="-image-base">--image-base</code></a>=<var class="Ar" title="Ar">addr</var></dt>
-  <dd>Set the base address to <var class="Ar" title="Ar">addr</var>.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-init"><code class="Fl" title="Fl" id="-init">--init</code></a>=<var class="Ar" title="Ar">symbol</var></dt>
-  <dd>Call <var class="Ar" title="Ar">symbol</var> at load-time.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-no-undefined"><code class="Fl" title="Fl" id="-no-undefined">--no-undefined</code></a></dt>
-  <dd>Report undefined symbols (even with
-      <code class="Fl" title="Fl">--shared</code>).</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-pack-dyn-relocs"><code class="Fl" title="Fl" id="-pack-dyn-relocs">--pack-dyn-relocs</code></a>=[<div class="Op"><b class="Sy" title="Sy">none</b>
-    | <b class="Sy" title="Sy">relr</b></div>]</dt>
-  <dd>If <b class="Sy" title="Sy">relr</b> is specified, all
+      terminate a <code class="Nm">mold</code> process.
+      <code class="Fl">--fork</code> hides that latency.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="gc-sections"><a class="permalink" href="#gc-sections"><code class="Fl">--gc-sections</code></a></dt>
+  <dd style="width: auto;">&#x00A0;</dd>
+  <dt id="no-gc-sections"><a class="permalink" href="#no-gc-sections"><code class="Fl">--no-gc-sections</code></a></dt>
+  <dd>Remove unreferenced sections.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="gdb-index"><a class="permalink" href="#gdb-index"><code class="Fl">--gdb-index</code></a></dt>
+  <dd>Create a <code class="Li">.gdb_index</code> section to speed up GNU
+      debugger. To use this, you need to compile source files with the
+      <code class="Fl">--ggnu-pubnames</code> compiler flag.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="hash-style"><a class="permalink" href="#hash-style"><code class="Fl">--hash-style</code></a>=[<a class="permalink" href="#sysv"><b class="Sy" id="sysv">sysv</b></a>
+    | <a class="permalink" href="#gnu"><b class="Sy" id="gnu">gnu</b></a> |
+    <a class="permalink" href="#both"><b class="Sy" id="both">both</b></a>]</dt>
+  <dd>Set hash style.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="icf"><a class="permalink" href="#icf"><code class="Fl">--icf</code></a>=[<b class="Sy">none</b>
+    | <a class="permalink" href="#safe"><b class="Sy" id="safe">safe</b></a> |
+    <a class="permalink" href="#all"><b class="Sy" id="all">all</b></a>]</dt>
+  <dd style="width: auto;">&#x00A0;</dd>
+  <dt id="no-icf"><a class="permalink" href="#no-icf"><code class="Fl">--no-icf</code></a></dt>
+  <dd>It is not uncommon for a program to contain many identical functions that
+      differ only in name. For example, a C++ template
+      <a class="permalink" href="#std::vector"><b class="Sy" id="std::vector">std::vector</b></a>
+      is very likely to be instantiated to the identical code for
+      <a class="permalink" href="#std::vector_int_"><b class="Sy" id="std::vector_int_">std::vector&lt;int&gt;</b></a>
+      and
+      <a class="permalink" href="#std::vector_unsigned_"><b class="Sy" id="std::vector_unsigned_">std::vector&lt;unsigned&gt;</b></a>
+      because the container cares only about the size of the parameter type.
+      Identical Code Folding (ICF) is a size optimization to identify and merge
+      such identical functions.
+    <p class="Pp">If <code class="Fl">--icf=all</code> is given,
+        <code class="Nm">mold</code> tries to merge all identical functions.
+        This reduces the size of the output most, but it is not
+        &#x201C;safe&#x201D; optimization. It is guaranteed in C and C++ that
+        two pointeres pointing two different functions will never be equal, but
+        <code class="Fl">--icf=all</code> breaks that assumption as two
+        functions have the same address after merging. So a care must be taken
+        when you use that flag that your program does not depend on the function
+        pointer uniqueness.</p>
+    <p class="Pp" id=".llvm_addrsig"><code class="Fl">--icf=safe</code> is a
+        flag to merge functions only when it is safe to do so. That is, if a
+        program does not take an address of a function, it is safe to merge that
+        function with other function, as you cannot compare a function pointer
+        with something else without taking an address of a function. needs to be
+        used with a compiler that supports
+        <a class="permalink" href="#.llvm_addrsig"><b class="Sy">.llvm_addrsig</b></a>
+        section which contains the information as to what symbols are
+        address-taken. LLVM/Clang supports that section by default. Since GCC
+        does not support it yet, you cannot use
+        <code class="Fl">--icf=safe</code> with GCC (it doesn't do any harm but
+        can't optimize at all.)</p>
+    <p class="Pp"><code class="Fl">--icf=none</code> and
+        <code class="Fl">--no-icf</code> disables ICF.</p>
+    <p class="Pp"></p>
+  </dd>
+  <dt id="ignore-data-address-equality"><a class="permalink" href="#ignore-data-address-equality"><code class="Fl">--ignore-data-address-equality</code></a></dt>
+  <dd>Make ICF to merge not only functions but also data. This option should be
+      used in combination with <code class="Fl">--icf=all</code>.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="image-base"><a class="permalink" href="#image-base"><code class="Fl">--image-base</code></a>=<var class="Ar">addr</var></dt>
+  <dd>Set the base address to <var class="Ar">addr</var>.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="init"><a class="permalink" href="#init"><code class="Fl">--init</code></a>=<var class="Ar">symbol</var></dt>
+  <dd>Call <var class="Ar">symbol</var> at load-time.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="no-undefined"><a class="permalink" href="#no-undefined"><code class="Fl">--no-undefined</code></a></dt>
+  <dd>Report undefined symbols (even with <code class="Fl">--shared</code>).
+    <p class="Pp"></p>
+  </dd>
+  <dt id="noinhibit-exec"><a class="permalink" href="#noinhibit-exec"><code class="Fl">--noinhibit-exec</code></a></dt>
+  <dd>Create an output file even if errors occur.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="pack-dyn-relocs"><a class="permalink" href="#pack-dyn-relocs"><code class="Fl">--pack-dyn-relocs</code></a>=[<b class="Sy">none</b>
+    | <b class="Sy">relr</b>]</dt>
+  <dd>If <b class="Sy">relr</b> is specified, all
       <code class="Li">R_*_RELATIVE</code> relocations are put into
       <code class="Li">.relr.dyn</code> section instead of
       <code class="Li">.rel.dyn</code> or <code class="Li">.rela.dyn</code>
       section. Since <code class="Li">.relr.dyn</code> section uses a
-      space-efficient encoding scheme, specifying that flag can reduce the size
+      space-efficient encoding scheme, specifying this flag can reduce the size
       of the output. This is typically most effective for position-independent
-      executable. Note that a runtime loader has to support
-      <code class="Li">.relr.dyn</code> to run executables or shared libraries
-      linked with <code class="Fl" title="Fl">--pack-dyn-relocs=relr</code>, and
-      only ChromeOS, Android and Fuchsia support it as of now in 2022.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-perf"><code class="Fl" title="Fl" id="-perf">--perf</code></a></dt>
-  <dd>Print performance statistics.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-pie"><code class="Fl" title="Fl" id="-pie">--pie</code></a>,
-    <code class="Fl" title="Fl">--pic-executable</code>,
-    <code class="Fl" title="Fl">--no-pie</code>,
-    <code class="Fl" title="Fl">--no-pic-executable</code></dt>
-  <dd>Create a position-independent executable.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-pop-state"><code class="Fl" title="Fl" id="-pop-state">--pop-state</code></a></dt>
-  <dd>Pop state of flags governing input file handling.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-preload"><code class="Fl" title="Fl" id="-preload">--preload</code></a></dt>
-  <dd>Preload object files.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-print-gc-sections"><code class="Fl" title="Fl" id="-print-gc-sections">--print-gc-sections</code></a>,
-    <code class="Fl" title="Fl">--no-print-gc-sections</code></dt>
-  <dd>Print removed unreferenced sections.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-print-icf-sections"><code class="Fl" title="Fl" id="-print-icf-sections">--print-icf-sections</code></a>,
-    <code class="Fl" title="Fl">--no-print-icf-sections</code></dt>
-  <dd>Print folded identical sections.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-push-state"><code class="Fl" title="Fl" id="-push-state">--push-state</code></a></dt>
-  <dd>Pop state of flags governing input file handling</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-quick-exit"><code class="Fl" title="Fl" id="-quick-exit">--quick-exit</code></a>,
-    <code class="Fl" title="Fl">--no-quick-exit</code></dt>
-  <dd>Use <code class="Dv" title="Dv">quick_exit</code> to exit.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-relax"><code class="Fl" title="Fl" id="-relax">--relax</code></a>,
-    <code class="Fl" title="Fl">--no-relax</code></dt>
-  <dd>Rewrite machine instructions with more efficient ones for some
-      relocations. The feature is enabled by default.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-require-defined"><code class="Fl" title="Fl" id="-require-defined">--require-defined</code></a>=<var class="Ar" title="Ar">symbol</var></dt>
-  <dd>Like <code class="Fl" title="Fl">--undefined</code>, except the new symbol
-      must be defined by the end of the link.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-repro"><code class="Fl" title="Fl" id="-repro">--repro</code></a></dt>
-  <dd>Embed input files into <code class="Dv" title="Dv">.repro</code>
-    section.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-retain-symbols-file"><code class="Fl" title="Fl" id="-retain-symbols-file">--retain-symbols-file</code></a>=<var class="Ar" title="Ar">file</var></dt>
-  <dd>Keep only symbols listed in <var class="Ar" title="Ar">file</var>.
-    <div class="Pp"></div>
-    <var class="Ar" title="Ar">file</var> is a text file containing a symbol
-      name on each line. <code class="Nm" title="Nm">mold</code> discards all
-      local symbols as well as global sybmol that are not in
-      <var class="Ar" title="Ar">file</var>. Note that this option removes
-      symbols only from <code class="Dv" title="Dv">.symtab</code> section and
-      does not affect <code class="Dv" title="Dv">.dynsym</code> section, which
-      is used for dynamic linking.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-rpath"><code class="Fl" title="Fl" id="-rpath">--rpath</code></a>=<var class="Ar" title="Ar">dir</var></dt>
-  <dd>Add <var class="Ar" title="Ar">dir</var> to runtime search path.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-run"><code class="Fl" title="Fl" id="-run">--run</code></a>
-    <code class="Cm" title="Cm">command</code>
-    <var class="Ar" title="Ar">arg</var> <var class="Ar" title="Ar">file
-    ...</var></dt>
-  <dd>Run <code class="Cm" title="Cm">command</code> with
-      <code class="Nm" title="Nm">mold</code> as
-      <span class="Pa" title="Pa">/usr/bin/ld</span>.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-shared"><code class="Fl" title="Fl" id="-shared">--shared</code></a>,
-    <code class="Fl" title="Fl">--Bshareable</code></dt>
-  <dd>Create a share library.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-spare-dynamic-tags"><code class="Fl" title="Fl" id="-spare-dynamic-tags">--spare-dynamic-tags</code></a>=<var class="Ar" title="Ar">number</var></dt>
-  <dd>Reserve given <var class="Ar" title="Ar">number</var> of tags in
-      <code class="Dv" title="Dv">.dynamic</code> section.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-static"><code class="Fl" title="Fl" id="-static">--static</code></a></dt>
-  <dd>Do not link against shared libraries.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-stats"><code class="Fl" title="Fl" id="-stats">--stats</code></a></dt>
-  <dd>Print input statistics.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-sysroot"><code class="Fl" title="Fl" id="-sysroot">--sysroot</code></a>=<var class="Ar" title="Ar">dir</var></dt>
-  <dd>Set target system root directory to
-    <var class="Ar" title="Ar">dir</var>.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-thread-count"><code class="Fl" title="Fl" id="-thread-count">--thread-count</code></a>=<var class="Ar" title="Ar">count</var></dt>
-  <dd>Use <var class="Ar" title="Ar">count</var> number of threads.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-threads"><code class="Fl" title="Fl" id="-threads">--threads</code></a>,
-    <code class="Fl" title="Fl">--no-threads</code></dt>
-  <dd>Use multiple threads. By default, <code class="Nm" title="Nm">mold</code>
-      uses as many threads as the number of cores or 32, whichever is the
-      smallest. The reason why it is capped to 32 is because
-      <code class="Nm" title="Nm">mold</code> doesn't scale well beyond that
-      point. To use only one thread, pass
-      <code class="Fl" title="Fl">--no-threads</code> or
-      <code class="Fl" title="Fl">--thread-count</code>=<b class="Sy" title="Sy">1</b>.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-trace"><code class="Fl" title="Fl" id="-trace">--trace</code></a></dt>
-  <dd>Print name of each input file.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-unique"><code class="Fl" title="Fl" id="-unique">--unique</code></a>=<var class="Ar" title="Ar">pattern</var></dt>
-  <dd>Don't merge input sections that match
-      <var class="Ar" title="Ar">pattern</var>.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-unresolved-symbols"><code class="Fl" title="Fl" id="-unresolved-symbols">--unresolved-symbols</code></a>=[<div class="Op"><b class="Sy" title="Sy">report-all</b>
-    | <b class="Sy" title="Sy">ignore-all</b> |
-    <b class="Sy" title="Sy">ignore-in-object-files</b> |
-    <b class="Sy" title="Sy">ignore-in-shared-libs</b></div>]</dt>
-  <dd>How to handle undefined symbols.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-version-script"><code class="Fl" title="Fl" id="-version-script">--version-script</code></a>=<var class="Ar" title="Ar">file</var></dt>
-  <dd>Read version script from <var class="Ar" title="Ar">file</var>.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-warn-common"><code class="Fl" title="Fl" id="-warn-common">--warn-common</code></a></dt>
+      executable.
+    <p class="Pp">Note that a runtime loader has to support
+        <code class="Li">.relr.dyn</code> to run executables or shared libraries
+        linked with <code class="Fl">--pack-dyn-relocs=relr</code>, and only
+        ChromeOS, Android and Fuchsia support it as of now in 2022.</p>
+    <p class="Pp"></p>
+  </dd>
+  <dt>-package-metadata=string</dt>
+  <dd>Embed <var class="Ar">string</var> to a .note.package section. This option
+      in intended to be used by a package management command such as
+      <code class="Cm">rpm</code> to embed metadata regarding a package to each
+      executable file.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="perf"><a class="permalink" href="#perf"><code class="Fl">--perf</code></a></dt>
+  <dd>Print performance statistics.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="pie"><a class="permalink" href="#pie"><code class="Fl">--pie</code></a>,
+    <code class="Fl">--pic-executable</code></dt>
   <dd style="width: auto;">&#x00A0;</dd>
-  <dt><a class="permalink" href="#-no-warn-common"><code class="Fl" title="Fl" id="-no-warn-common">--no-warn-common</code></a></dt>
-  <dd>Warn about common symbols.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-warn-unresolved-symbols"><code class="Fl" title="Fl" id="-warn-unresolved-symbols">--warn-unresolved-symbols</code></a>,
-    <code class="Fl" title="Fl">--error-unresolved-symbols</code></dt>
+  <dt id="no-pie"><a class="permalink" href="#no-pie"><code class="Fl">--no-pie</code></a>,
+    <code class="Fl">--no-pic-executable</code></dt>
+  <dd>Create a position-independent executable.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="preload"><a class="permalink" href="#preload"><code class="Fl">--preload</code></a></dt>
+  <dd>Preload object files.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="print-gc-sections"><a class="permalink" href="#print-gc-sections"><code class="Fl">--print-gc-sections</code></a></dt>
+  <dd style="width: auto;">&#x00A0;</dd>
+  <dt id="no-print-gc-sections"><a class="permalink" href="#no-print-gc-sections"><code class="Fl">--no-print-gc-sections</code></a></dt>
+  <dd>Print removed unreferenced sections.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="print-icf-sections"><a class="permalink" href="#print-icf-sections"><code class="Fl">--print-icf-sections</code></a></dt>
+  <dd style="width: auto;">&#x00A0;</dd>
+  <dt id="no-print-icf-sections"><a class="permalink" href="#no-print-icf-sections"><code class="Fl">--no-print-icf-sections</code></a></dt>
+  <dd>Print folded identical sections.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="push-state"><a class="permalink" href="#push-state"><code class="Fl">--push-state</code></a></dt>
+  <dd style="width: auto;">&#x00A0;</dd>
+  <dt id="pop-state"><a class="permalink" href="#pop-state"><code class="Fl">--pop-state</code></a></dt>
+  <dd><a class="permalink" href="#push-state~2"><code class="Fl" id="push-state~2">--push-state</code></a>
+      saves the current values of <code class="Fl">--as-needed</code>,
+      <code class="Fl">--whole-archive</code>, <code class="Fl">--static</code>,
+      and <code class="Fl">--start-lib</code>. The saved values can be restored
+      by <code class="Fl">--pop-state</code>.
+    <p class="Pp"><code class="Fl">--push-state</code> and
+        <code class="Fl">--pop-state</code> pairs can nest.</p>
+    <p class="Pp">These options are useful when you want to construct linker
+        command line options programmatically. For example, if you want to link
+        <var class="Ar">libfoo.so</var> by as-needed basis but don't want to
+        change the global state of <code class="Fl">--as-needed</code>, you can
+        append &quot;--push-state --as-needed -lfoo --pop-state&quot; to the
+        linker command line options.</p>
+    <p class="Pp"></p>
+  </dd>
+  <dt id="quick-exit"><a class="permalink" href="#quick-exit"><code class="Fl">--quick-exit</code></a></dt>
+  <dd style="width: auto;">&#x00A0;</dd>
+  <dt id="no-quick-exit"><a class="permalink" href="#no-quick-exit"><code class="Fl">--no-quick-exit</code></a></dt>
+  <dd>Use <code class="Dv">quick_exit</code> to exit.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="relax"><a class="permalink" href="#relax"><code class="Fl">--relax</code></a></dt>
+  <dd style="width: auto;">&#x00A0;</dd>
+  <dt id="no-relax"><a class="permalink" href="#no-relax"><code class="Fl">--no-relax</code></a></dt>
+  <dd>Rewrite machine instructions with more efficient ones for some
+      relocations. The feature is enabled by default.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="require-defined"><a class="permalink" href="#require-defined"><code class="Fl">--require-defined</code></a>=<var class="Ar">symbol</var></dt>
+  <dd>Like <code class="Fl">--undefined</code>, except the new symbol must be
+      defined by the end of the link.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="repro"><a class="permalink" href="#repro"><code class="Fl">--repro</code></a></dt>
+  <dd>Embed input files into <code class="Dv">.repro</code> section.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="retain-symbols-file"><a class="permalink" href="#retain-symbols-file"><code class="Fl">--retain-symbols-file</code></a>=<var class="Ar">file</var></dt>
+  <dd>Keep only symbols listed in <var class="Ar">file</var>.
+    <p class="Pp"><var class="Ar">file</var> is a text file containing a symbol
+        name on each line. <code class="Nm">mold</code> discards all local
+        symbols as well as global sybmol that are not in
+        <var class="Ar">file</var>. Note that this option removes symbols only
+        from <code class="Dv">.symtab</code> section and does not affect
+        <code class="Dv">.dynsym</code> section, which is used for dynamic
+        linking.</p>
+    <p class="Pp"></p>
+  </dd>
+  <dt id="reverse-sections"><a class="permalink" href="#reverse-sections"><code class="Fl">--reverse-sections</code></a></dt>
+  <dd>Reverses the order of input sections before assigning them the offsets in
+      the output file.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="rpath"><a class="permalink" href="#rpath"><code class="Fl">--rpath</code></a>=<var class="Ar">dir</var></dt>
+  <dd>Add <var class="Ar">dir</var> to runtime search path.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="run"><a class="permalink" href="#run"><code class="Fl">--run</code></a>
+    <code class="Cm">command</code> <var class="Ar">arg</var>
+    <var class="Ar">file ...</var></dt>
+  <dd>Run <code class="Cm">command</code> with <code class="Nm">mold</code> as
+      <span class="Pa">/usr/bin/ld</span>.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="section-start"><a class="permalink" href="#section-start"><code class="Fl">--section-start</code></a>=<var class="Ar">section</var>=<var class="Ar">address</var></dt>
+  <dd>Set <var class="Ar">address</var> to <var class="Ar">section</var>.
+      <var class="Ar">address</var> is a hexadecimal number that may start with
+      an optional &#x2018;0x&#x2019;.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="shared"><a class="permalink" href="#shared"><code class="Fl">--shared</code></a>,
+    <code class="Fl">--Bshareable</code></dt>
+  <dd>Create a share library.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="shuffle-sections"><a class="permalink" href="#shuffle-sections"><code class="Fl">--shuffle-sections</code></a></dt>
+  <dd style="width: auto;">&#x00A0;</dd>
+  <dt id="shuffle-sections~2"><a class="permalink" href="#shuffle-sections~2"><code class="Fl">--shuffle-sections</code></a>=<var class="Ar">number</var></dt>
+  <dd>Randomizes the output by shuffleing the order of input sections before
+      assigning them the offsets in the output file. If
+      <var class="Ar">number</var> is given, it's used as a seed for the random
+      number generator, so that the linker produces the same output as for the
+      same seed. If no seed is given, it uses a random number as a seed.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="spare-dynamic-tags"><a class="permalink" href="#spare-dynamic-tags"><code class="Fl">--spare-dynamic-tags</code></a>=<var class="Ar">number</var></dt>
+  <dd>Reserve given <var class="Ar">number</var> of tags in
+      <code class="Dv">.dynamic</code> section.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="start-lib"><a class="permalink" href="#start-lib"><code class="Fl">--start-lib</code></a></dt>
+  <dd style="width: auto;">&#x00A0;</dd>
+  <dt id="end-lib"><a class="permalink" href="#end-lib"><code class="Fl">--end-lib</code></a></dt>
+  <dd>Handle object files between <code class="Fl">--start-lib</code> and
+      <code class="Fl">--end-lib</code> as if they were in an archive file. That
+      means object files between them are linked only when they are needed to
+      resolve undefined symbols. The options are useful if you want to link
+      object files only when they are needed but want to avoid the overhead of
+      running <a class="Xr">ar(3)</a>.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="static"><a class="permalink" href="#static"><code class="Fl">--static</code></a></dt>
+  <dd>Do not link against shared libraries.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="stats"><a class="permalink" href="#stats"><code class="Fl">--stats</code></a></dt>
+  <dd>Print input statistics.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="sysroot"><a class="permalink" href="#sysroot"><code class="Fl">--sysroot</code></a>=<var class="Ar">dir</var></dt>
+  <dd>Set target system root directory to <var class="Ar">dir</var>.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="thread-count"><a class="permalink" href="#thread-count"><code class="Fl">--thread-count</code></a>=<var class="Ar">count</var></dt>
+  <dd>Use <var class="Ar">count</var> number of threads.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="threads"><a class="permalink" href="#threads"><code class="Fl">--threads</code></a></dt>
+  <dd style="width: auto;">&#x00A0;</dd>
+  <dt id="no-threads"><a class="permalink" href="#no-threads"><code class="Fl">--no-threads</code></a></dt>
+  <dd>Use multiple threads. By default, <code class="Nm">mold</code> uses as
+      many threads as the number of cores or 32, whichever is the smallest. The
+      reason why it is capped to 32 is because <code class="Nm">mold</code>
+      doesn't scale well beyond that point. To use only one thread, pass
+      <code class="Fl">--no-threads</code> or
+      <code class="Fl">--thread-count</code>=<a class="permalink" href="#1"><b class="Sy" id="1">1</b></a>.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="trace"><a class="permalink" href="#trace"><code class="Fl">--trace</code></a></dt>
+  <dd>Print name of each input file.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="unique"><a class="permalink" href="#unique"><code class="Fl">--unique</code></a>=<var class="Ar">pattern</var></dt>
+  <dd>Don't merge input sections that match <var class="Ar">pattern</var>.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="unresolved-symbols"><a class="permalink" href="#unresolved-symbols"><code class="Fl">--unresolved-symbols</code></a>=[<a class="permalink" href="#report-all"><b class="Sy" id="report-all">report-all</b></a>
+    |
+    <a class="permalink" href="#ignore-all"><b class="Sy" id="ignore-all">ignore-all</b></a>
+    |
+    <a class="permalink" href="#ignore-in-object-files"><b class="Sy" id="ignore-in-object-files">ignore-in-object-files</b></a>
+    |
+    <a class="permalink" href="#ignore-in-shared-libs"><b class="Sy" id="ignore-in-shared-libs">ignore-in-shared-libs</b></a>]</dt>
+  <dd>How to handle undefined symbols.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="version-script"><a class="permalink" href="#version-script"><code class="Fl">--version-script</code></a>=<var class="Ar">file</var></dt>
+  <dd>Read version script from <var class="Ar">file</var>.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="warn-common"><a class="permalink" href="#warn-common"><code class="Fl">--warn-common</code></a></dt>
+  <dd style="width: auto;">&#x00A0;</dd>
+  <dt id="no-warn-common"><a class="permalink" href="#no-warn-common"><code class="Fl">--no-warn-common</code></a></dt>
+  <dd>Warn about common symbols.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="warn-once"><a class="permalink" href="#warn-once"><code class="Fl">--warn-once</code></a></dt>
+  <dd>Only warn once for each undefined symbol instead of warn for each
+      relocation referring an undefined symbol.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="warn-unresolved-symbols"><a class="permalink" href="#warn-unresolved-symbols"><code class="Fl">--warn-unresolved-symbols</code></a></dt>
+  <dd style="width: auto;">&#x00A0;</dd>
+  <dt id="error-unresolved-symbols"><a class="permalink" href="#error-unresolved-symbols"><code class="Fl">--error-unresolved-symbols</code></a></dt>
   <dd>Normally, the linker reports an error for unresolved symbols.
-      <code class="Fl" title="Fl">--warn-unresolved-symbols</code> option turns
-      it into a warning.
-      <code class="Fl" title="Fl">--error-unresolved-symbols</code> option
-      restores the default behavior.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-whole-archive"><code class="Fl" title="Fl" id="-whole-archive">--whole-archive</code></a>,
-    <code class="Fl" title="Fl">--no-whole-archive</code></dt>
-  <dd>When archive files (<b class="Sy" title="Sy">.a</b> files) are given to a
-      linker, only object files that are needed to resolve undefined symbols are
-      extracted from them and linked to an output file.
-      <code class="Fl" title="Fl">--whole-archive</code> changes that behavior
-      for subsequent archives so that a linker extracts all object files and
-      link them to an output. For example, if you are creating a shared object
-      file and you want to include all archive members to the output, you should
-      pass <code class="Fl" title="Fl">--whole-archive</code>.
-      <code class="Fl" title="Fl">--no-whole-archive</code> restores the default
-      behavior for subsequent archives.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#-wrap"><code class="Fl" title="Fl" id="-wrap">--wrap</code></a>=<var class="Ar" title="Ar">symbol</var></dt>
-  <dd>Make <var class="Ar" title="Ar">symbol</var> to be resolved to
-      <b class="Sy" title="Sy">__wrap_</b><var class="Ar" title="Ar">symbol</var>.
+      <code class="Fl">--warn-unresolved-symbols</code> option turns it into a
+      warning. <code class="Fl">--error-unresolved-symbols</code> option
+      restores the default behavior.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="whole-archive"><a class="permalink" href="#whole-archive"><code class="Fl">--whole-archive</code></a></dt>
+  <dd style="width: auto;">&#x00A0;</dd>
+  <dt id="no-whole-archive"><a class="permalink" href="#no-whole-archive"><code class="Fl">--no-whole-archive</code></a></dt>
+  <dd>When archive files
+      (<a class="permalink" href="#.a"><b class="Sy" id=".a">.a</b></a> files)
+      are given to a linker, only object files that are needed to resolve
+      undefined symbols are extracted from them and linked to an output file.
+      <code class="Fl">--whole-archive</code> changes that behavior for
+      subsequent archives so that a linker extracts all object files and link
+      them to an output. For example, if you are creating a shared object file
+      and you want to include all archive members to the output, you should pass
+      <code class="Fl">--whole-archive</code>.
+      <code class="Fl">--no-whole-archive</code> restores the default behavior
+      for subsequent archives.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="wrap"><a class="permalink" href="#wrap"><code class="Fl">--wrap</code></a>=<var class="Ar">symbol</var></dt>
+  <dd>Make <var class="Ar">symbol</var> to be resolved to
+      <a class="permalink" href="#__wrap_"><b class="Sy" id="__wrap_">__wrap_</b></a><var class="Ar">symbol</var>.
       The original symbol can be resolved as
-      <b class="Sy" title="Sy">__real_</b><var class="Ar" title="Ar">symbol</var>.
-      This option is typically used for wrapping an existing function.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#z"><code class="Fl" title="Fl" id="z">-z</code></a>
-    <code class="Cm" title="Cm">cet-report</code>=<b class="Sy" title="Sy">none</b>
-    | <b class="Sy" title="Sy">warning</b> |
-    <b class="Sy" title="Sy">error</b></dt>
+      <a class="permalink" href="#__real_"><b class="Sy" id="__real_">__real_</b></a><var class="Ar">symbol</var>.
+      This option is typically used for wrapping an existing function.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="z"><a class="permalink" href="#z"><code class="Fl">-z</code></a>
+    <code class="Cm">cet-report</code>=[<b class="Sy">none</b> |
+    <b class="Sy">warning</b> | <b class="Sy">error</b>]</dt>
   <dd>Intel Control-flow Enforcement Technology (CET) is a new x86 feature
       available since Tiger Lake which is released in 2020. It defines new
       instructions to harden security to protect programs from control hijacking
       attacks. You can tell compiler to use the feature by specifying the
-      <code class="Fl" title="Fl">-fcf-protection</code> flag.
-    <div class="Pp"></div>
-    <code class="Fl" title="Fl">-z</code>
-      <code class="Cm" title="Cm">cet-report</code> flag is used to make sure
-      that all object files were compiled with a correct
-      <code class="Fl" title="Fl">-fcf-protection</code> flag. If
-      <b class="Sy" title="Sy">warning</b> or <b class="Sy" title="Sy">error</b>
-      are given, <code class="Nm" title="Nm">mold</code> prints out a warning or
-      an error message if an object file was not compiled with the compiler
-      flag.
-    <div class="Pp"></div>
-    <code class="Nm" title="Nm">mold</code> looks for
-      <code class="Li">GNU_PROPERTY_X86_FEATURE_1_IBT</code> bit and
-      <code class="Li">GNU_PROPERTY_X86_FEATURE_1_SHSTK</code> bit in
-      <code class="Li">.note.gnu.property</code> section to determine whether or
-      not an object file was compiled with
-      <code class="Fl" title="Fl">-fcf-protection</code>.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#z_2"><code class="Fl" title="Fl" id="z_2">-z</code></a>
-    <code class="Cm" title="Cm">now</code>,
-    <code class="Fl" title="Fl">-z</code>
-    <code class="Cm" title="Cm">lazy</code></dt>
+      <code class="Fl">-fcf-protection</code> flag.
+    <p class="Pp"><code class="Fl">-z</code> <code class="Cm">cet-report</code>
+        flag is used to make sure that all object files were compiled with a
+        correct <code class="Fl">-fcf-protection</code> flag. If
+        <b class="Sy">warning</b> or <b class="Sy">error</b> are given,
+        <code class="Nm">mold</code> prints out a warning or an error message if
+        an object file was not compiled with the compiler flag.</p>
+    <p class="Pp"><code class="Nm">mold</code> looks for
+        <code class="Li">GNU_PROPERTY_X86_FEATURE_1_IBT</code> bit and
+        <code class="Li">GNU_PROPERTY_X86_FEATURE_1_SHSTK</code> bit in
+        <code class="Li">.note.gnu.property</code> section to determine whether
+        or not an object file was compiled with
+        <code class="Fl">-fcf-protection</code>.</p>
+    <p class="Pp"></p>
+  </dd>
+  <dt id="z~2"><a class="permalink" href="#z~2"><code class="Fl">-z</code></a>
+    <code class="Cm">now</code></dt>
+  <dd style="width: auto;">&#x00A0;</dd>
+  <dt id="z~3"><a class="permalink" href="#z~3"><code class="Fl">-z</code></a>
+    <code class="Cm">lazy</code></dt>
   <dd>By default, functions referring other ELF modules are resolved by the
       dynamic linker when they are called for the first time.
-      <code class="Fl" title="Fl">-z</code>
-      <code class="Cm" title="Cm">now</code> marks an executable or a shared
-      library file so that all dynamic symbols are loaded when a file is loaded
-      to memory. <code class="Fl" title="Fl">-z</code>
-      <code class="Cm" title="Cm">lazy</code> restores the default
-    behavior.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#z_3"><code class="Fl" title="Fl" id="z_3">-z</code></a>
-    <code class="Cm" title="Cm">origin</code></dt>
-  <dd>Mark object requiring immediate <code class="Dv" title="Dv">$ORIGIN</code>
-      processing at runtime.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#z_4"><code class="Fl" title="Fl" id="z_4">-z</code></a>
-    <code class="Cm" title="Cm">ibt</code></dt>
+      <code class="Fl">-z</code> <code class="Cm">now</code> marks an executable
+      or a shared library file so that all dynamic symbols are loaded when a
+      file is loaded to memory. <code class="Fl">-z</code>
+      <code class="Cm">lazy</code> restores the default behavior.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="z~4"><a class="permalink" href="#z~4"><code class="Fl">-z</code></a>
+    <code class="Cm">origin</code></dt>
+  <dd>Mark object requiring immediate <code class="Dv">$ORIGIN</code> processing
+      at runtime.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="z~5"><a class="permalink" href="#z~5"><code class="Fl">-z</code></a>
+    <code class="Cm">ibt</code></dt>
   <dd>Turn on <code class="Li">GNU_PROPERTY_X86_FEATURE_1_IBT</code> bit in
       <code class="Li">.note.gnu.property</code> section to indicate that the
       output uses IBT-enabled PLT. This option implies
-      <code class="Fl" title="Fl">-z</code>
-      <code class="Cm" title="Cm">ibtplt</code>.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#z_5"><code class="Fl" title="Fl" id="z_5">-z</code></a>
-    <code class="Cm" title="Cm">ibtplt</code></dt>
+      <code class="Fl">-z</code> <code class="Cm">ibtplt</code>.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="z~6"><a class="permalink" href="#z~6"><code class="Fl">-z</code></a>
+    <code class="Cm">ibtplt</code></dt>
   <dd>Generate Intel Branch Tracking (IBT)-enabled PLT.
-    <div class="Pp"></div>
-    IBT is part of Intel Control-flow Enforcement Technology (CET). IBT is a new
-      x86 feature available since Tiger Lake which is released in 2020. If IBT
-      is enabled, all indirect branch instructions have to branch to a so-called
-      &quot;landing pad&quot; instruction. Landing pad itself is a no-op, but it
-      works as a marker that branching to that instruction is expected. If
-      there's no landing pad after branch, the CPU raises an exception. This
-      mechanism makes ROP attacks difficult.
-    <div class="Pp"></div>
-    Since PLT can be used as an indirect branch target, we need a different
-      instruction sequence for IBT-enabled PLT. If <b class="Sy" title="Sy">-z
-      ibtplt</b> is specified, <code class="Nm" title="Nm">mold</code> generates
-      PLT entries that start with a landing pad. The size of IBT-enabled PLT is
-      24 bytes as opposed to 16 bytes regular PLT.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#z_6"><code class="Fl" title="Fl" id="z_6">-z</code></a>
-    <code class="Cm" title="Cm">execstack</code>,
-    <code class="Fl" title="Fl">-z</code>
-    <code class="Cm" title="Cm">noexecstack</code></dt>
+    <p class="Pp">IBT is part of Intel Control-flow Enforcement Technology
+        (CET). IBT is a new x86 feature available since Tiger Lake which is
+        released in 2020. If IBT is enabled, all indirect branch instructions
+        have to branch to a so-called &quot;landing pad&quot; instruction.
+        Landing pad itself is a no-op, but it works as a marker that branching
+        to that instruction is expected. If there's no landing pad after branch,
+        the CPU raises an exception. This mechanism makes ROP attacks
+      difficult.</p>
+    <p class="Pp">Since PLT can be used as an indirect branch target, we need a
+        different instruction sequence for IBT-enabled PLT. If
+        <b class="Sy">-z</b> <code class="Cm">ibtplt</code> is specified,
+        <code class="Nm">mold</code> generates PLT entries that start with a
+        landing pad. The size of IBT-enabled PLT is 24 bytes as opposed to 16
+        bytes regular PLT.</p>
+    <p class="Pp"></p>
+  </dd>
+  <dt id="z~7"><a class="permalink" href="#z~7"><code class="Fl">-z</code></a>
+    <code class="Cm">execstack</code></dt>
+  <dd style="width: auto;">&#x00A0;</dd>
+  <dt id="z~8"><a class="permalink" href="#z~8"><code class="Fl">-z</code></a>
+    <code class="Cm">noexecstack</code></dt>
   <dd>By default, the pages for the stack area (i.e. the pages where local
       variables reside) are not executable for security reasons.
-      <code class="Fl" title="Fl">-z</code>
-      <code class="Cm" title="Cm">execstack</code> makes it executable.
-      <code class="Fl" title="Fl">-z</code>
-      <code class="Cm" title="Cm">noexecstack</code> restores the default
-      behavior.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#z_7"><code class="Fl" title="Fl" id="z_7">-z</code></a>
-    <code class="Cm" title="Cm">keep-text-section-prefix</code>,
-    <code class="Fl" title="Fl">-z</code>
-    <code class="Cm" title="Cm">nokeep-text-section-prefix</code></dt>
-  <dd>Keep <code class="Dv" title="Dv">.text.hot</code>,
-      <code class="Dv" title="Dv">.text.unknown</code>,
-      <code class="Dv" title="Dv">.text.unlikely</code>,
-      <code class="Dv" title="Dv">.text.startup</code> and
-      <code class="Dv" title="Dv">.text.exit</code> as separate sections in the
-      final binary.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#z_8"><code class="Fl" title="Fl" id="z_8">-z</code></a>
-    <code class="Cm" title="Cm">relro</code>,
-    <code class="Fl" title="Fl">-z</code>
-    <code class="Cm" title="Cm">norelro</code></dt>
-  <dd>Some sections such as <code class="Dv" title="Dv">.dynamic</code> have to
-      be writable only during an executable or a shared library file is being
-      loaded to memory. Once the dynamic linker finishes its job, such sections
-      won't be mutated by anyone. As a security mitigation, it is preferred to
-      make such segments read-only during program execution.
-    <div class="Pp"></div>
-    <code class="Fl" title="Fl">-z</code>
-      <code class="Cm" title="Cm">relro</code> puts such sections into a special
-      section called <code class="Dv" title="Dv">relro</code>. The dynamic
-      linker make a relro segment read-only after it finishes its job.
-    <div class="Pp"></div>
-    By default, <code class="Nm" title="Nm">mold</code> generates a
-      <b class="Sy" title="Sy">relro</b> segment.
-      <code class="Fl" title="Fl">-z</code>
-      <code class="Cm" title="Cm">norelro</code> disables the feature.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#z_9"><code class="Fl" title="Fl" id="z_9">-z</code></a>
-    <code class="Cm" title="Cm">separate-loadable-segments</code>,
-    <code class="Fl" title="Fl">-z</code>
-    <code class="Cm" title="Cm">separate-code</code>,
-    <code class="Fl" title="Fl">-z</code>
-    <code class="Cm" title="Cm">noseparate-code</code></dt>
+      <code class="Fl">-z</code> <code class="Cm">execstack</code> makes it
+      executable. <code class="Fl">-z</code> <code class="Cm">noexecstack</code>
+      restores the default behavior.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="z~9"><a class="permalink" href="#z~9"><code class="Fl">-z</code></a>
+    <code class="Cm">keep-text-section-prefix</code></dt>
+  <dd style="width: auto;">&#x00A0;</dd>
+  <dt id="z~10"><a class="permalink" href="#z~10"><code class="Fl">-z</code></a>
+    <code class="Cm">nokeep-text-section-prefix</code></dt>
+  <dd>Keep <code class="Dv">.text.hot</code>,
+      <code class="Dv">.text.unknown</code>,
+      <code class="Dv">.text.unlikely</code>,
+      <code class="Dv">.text.startup</code> and
+      <code class="Dv">.text.exit</code> as separate sections in the final
+      binary.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="z~11"><a class="permalink" href="#z~11"><code class="Fl">-z</code></a>
+    <code class="Cm">relro</code></dt>
+  <dd style="width: auto;">&#x00A0;</dd>
+  <dt id="z~12"><a class="permalink" href="#z~12"><code class="Fl">-z</code></a>
+    <code class="Cm">norelro</code></dt>
+  <dd>Some sections such as <code class="Dv">.dynamic</code> have to be writable
+      only during an executable or a shared library file is being loaded to
+      memory. Once the dynamic linker finishes its job, such sections won't be
+      mutated by anyone. As a security mitigation, it is preferred to make such
+      segments read-only during program execution.
+    <p class="Pp"><code class="Fl">-z</code> <code class="Cm">relro</code> puts
+        such sections into a special section called
+        <code class="Dv">relro</code>. The dynamic linker make a relro segment
+        read-only after it finishes its job.</p>
+    <p class="Pp" id="relro">By default, <code class="Nm">mold</code> generates
+        a <a class="permalink" href="#relro"><b class="Sy">relro</b></a>
+        segment. <code class="Fl">-z</code> <code class="Cm">norelro</code>
+        disables the feature.</p>
+    <p class="Pp"></p>
+  </dd>
+  <dt id="z~13"><a class="permalink" href="#z~13"><code class="Fl">-z</code></a>
+    <code class="Cm">separate-loadable-segments</code></dt>
+  <dd style="width: auto;">&#x00A0;</dd>
+  <dt id="z~14"><a class="permalink" href="#z~14"><code class="Fl">-z</code></a>
+    <code class="Cm">separate-code</code></dt>
+  <dd style="width: auto;">&#x00A0;</dd>
+  <dt id="z~15"><a class="permalink" href="#z~15"><code class="Fl">-z</code></a>
+    <code class="Cm">noseparate-code</code></dt>
   <dd>If one memory page contains multiple segments, the page protection bits
       are set in such a way that needed attributes (writable or executable) are
       satisifed for all segments. This usually happens at a boundary of two
       segments with two different attributes.
-    <div class="Pp"></div>
-    <code class="Cm" title="Cm">separate-loadable-segments</code> adds paddings
-      between segments with different attributes so that they do not share the
-      same page. This is the default.
-    <div class="Pp"></div>
-    <code class="Cm" title="Cm">separate-code</code> adds paddings only between
-      executable and non-executable segments.
-    <div class="Pp"></div>
-    <code class="Cm" title="Cm">noseparate-code</code> does not add any paddings
-      between segments.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#z_10"><code class="Fl" title="Fl" id="z_10">-z</code></a>
-    <code class="Cm" title="Cm">defs</code>,
-    <code class="Fl" title="Fl">-z</code>
-    <code class="Cm" title="Cm">nodefs</code></dt>
-  <dd>Report undefined symbols (even with
-      <code class="Fl" title="Fl">--shared</code>).</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#z_11"><code class="Fl" title="Fl" id="z_11">-z</code></a>
-    <code class="Cm" title="Cm">shstk</code></dt>
+    <p class="Pp"><code class="Cm">separate-loadable-segments</code> adds
+        paddings between segments with different attributes so that they do not
+        share the same page. This is the default.</p>
+    <p class="Pp"><code class="Cm">separate-code</code> adds paddings only
+        between executable and non-executable segments.</p>
+    <p class="Pp"><code class="Cm">noseparate-code</code> does not add any
+        paddings between segments.</p>
+    <p class="Pp"></p>
+  </dd>
+  <dt id="z~16"><a class="permalink" href="#z~16"><code class="Fl">-z</code></a>
+    <code class="Cm">defs</code></dt>
+  <dd style="width: auto;">&#x00A0;</dd>
+  <dt id="z~17"><a class="permalink" href="#z~17"><code class="Fl">-z</code></a>
+    <code class="Cm">nodefs</code></dt>
+  <dd>Report undefined symbols (even with <code class="Fl">--shared</code>).
+    <p class="Pp"></p>
+  </dd>
+  <dt id="z~18"><a class="permalink" href="#z~18"><code class="Fl">-z</code></a>
+    <code class="Cm">shstk</code></dt>
   <dd>Enforce shadow stack by turning GNU_PROPERTY_X86_FEATURE_1_SHSTK bit in
       <code class="Li">.note.gnu.property</code> output section. Shadow stack is
       part of Intel Control-flow Enforcement Technology (CET), which is
-      available since Tiger Lake (2020).</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><code class="Fl" title="Fl">-</code><code class="Fl" title="Fl">-z</code>
-    <code class="Cm" title="Cm">notext</code>,
-    <code class="Fl" title="Fl">-z</code>
-    <code class="Cm" title="Cm">textoff</code>,
-    <code class="Fl" title="Fl">-z</code>
-    <code class="Cm" title="Cm">text</code></dt>
-  <dd><code class="Nm" title="Nm">mold</code> by default reports an error if
-      dynamic relocations are created in read-only sections. If
-      <code class="Fl" title="Fl">-z</code>
-      <code class="Cm" title="Cm">notext</code> or
-      <code class="Fl" title="Fl">-z</code>
-      <code class="Cm" title="Cm">textoff</code> are given,
-      <code class="Nm" title="Nm">mold</code> creates such dynamic relocations
-      without reporting an error. <code class="Fl" title="Fl">-z</code>
-      <code class="Cm" title="Cm">text</code> restores the default
-    behavior.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#z_12"><code class="Fl" title="Fl" id="z_12">-z</code></a>
-    <code class="Cm" title="Cm">max-page-size</code></dt>
+      available since Tiger Lake (2020).
+    <p class="Pp"></p>
+  </dd>
+  <dt id="z~19"><a class="permalink" href="#z~19"><code class="Fl">-z</code></a>
+    <code class="Cm">text</code></dt>
+  <dd style="width: auto;">&#x00A0;</dd>
+  <dt id="z~20"><a class="permalink" href="#z~20"><code class="Fl">-z</code></a>
+    <code class="Cm">notext</code>, <code class="Fl">-z</code>
+    <code class="Cm">textoff</code></dt>
+  <dd><code class="Nm">mold</code> by default reports an error if dynamic
+      relocations are created in read-only sections. If
+      <code class="Fl">-z</code> <code class="Cm">notext</code> or
+      <code class="Fl">-z</code> <code class="Cm">textoff</code> are given,
+      <code class="Nm">mold</code> creates such dynamic relocations without
+      reporting an error. <code class="Fl">-z</code>
+      <code class="Cm">text</code> restores the default behavior.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="z~21"><a class="permalink" href="#z~21"><code class="Fl">-z</code></a>
+    <code class="Cm">max-page-size</code></dt>
   <dd>Some CPU ISAs support multiple different memory page sizes. This option
       specifies the maximum page size that an output binary can run on. If you
       specify a large value, the output can run on both large and small page
       systems, but it wastes a bit of memory at page boundaries on systems with
       small pages.
-    <div class="Pp"></div>
-    The default value is 4 KiB for i386 and x86-64, and 64 KiB for ARM64.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#z_13"><code class="Fl" title="Fl" id="z_13">-z</code></a>
-    <code class="Cm" title="Cm">nodefaultlib</code></dt>
-  <dd>Make the dynamic loader to ignore default search paths.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#z_14"><code class="Fl" title="Fl" id="z_14">-z</code></a>
-    <code class="Cm" title="Cm">nodelete</code></dt>
-  <dd>Mark DSO non-deletable at runtime.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#z_15"><code class="Fl" title="Fl" id="z_15">-z</code></a>
-    <code class="Cm" title="Cm">nodlopen</code></dt>
-  <dd>Mark DSO not available to <a class="Xr" title="Xr">dlopen(3)</a>.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#z_16"><code class="Fl" title="Fl" id="z_16">-z</code></a>
-    <code class="Cm" title="Cm">nodump</code></dt>
-  <dd>Mark DSO not available to <a class="Xr" title="Xr">dldump(3)</a>.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#z_17"><code class="Fl" title="Fl" id="z_17">-z</code></a>
-    <code class="Cm" title="Cm">nocopyreloc</code></dt>
-  <dd>Do not create copy relocations.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#z_18"><code class="Fl" title="Fl" id="z_18">-z</code></a>
-    <code class="Cm" title="Cm">initfirst</code></dt>
-  <dd>Mark DSO to be initialized first at runtime.</dd>
-  <dt>&#x00A0;</dt>
-  <dd>&#x00A0;</dd>
-  <dt><a class="permalink" href="#z_19"><code class="Fl" title="Fl" id="z_19">-z</code></a>
-    <code class="Cm" title="Cm">interpose</code></dt>
+    <p class="Pp">The default value is 4 KiB for i386, x86-64 and RISC-V, and 64
+        KiB for ARM64.</p>
+    <p class="Pp"></p>
+  </dd>
+  <dt id="z~22"><a class="permalink" href="#z~22"><code class="Fl">-z</code></a>
+    <code class="Cm">nodefaultlib</code></dt>
+  <dd>Make the dynamic loader to ignore default search paths.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="z~23"><a class="permalink" href="#z~23"><code class="Fl">-z</code></a>
+    <code class="Cm">nodelete</code></dt>
+  <dd>Mark DSO non-deletable at runtime.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="z~24"><a class="permalink" href="#z~24"><code class="Fl">-z</code></a>
+    <code class="Cm">nodlopen</code></dt>
+  <dd>Mark DSO not available to <a class="Xr">dlopen(3)</a>.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="z~25"><a class="permalink" href="#z~25"><code class="Fl">-z</code></a>
+    <code class="Cm">nodump</code></dt>
+  <dd>Mark DSO not available to <a class="Xr">dldump(3)</a>.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="z~26"><a class="permalink" href="#z~26"><code class="Fl">-z</code></a>
+    <code class="Cm">nocopyreloc</code></dt>
+  <dd>Do not create copy relocations.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="z~27"><a class="permalink" href="#z~27"><code class="Fl">-z</code></a>
+    <code class="Cm">initfirst</code></dt>
+  <dd>Mark DSO to be initialized first at runtime.
+    <p class="Pp"></p>
+  </dd>
+  <dt id="z~28"><a class="permalink" href="#z~28"><code class="Fl">-z</code></a>
+    <code class="Cm">interpose</code></dt>
   <dd>Mark object to interpose all DSOs but executable.</dd>
 </dl>
-<h1 class="Sh" title="Sh" id="SEE_ALSO"><a class="permalink" href="#SEE_ALSO">SEE
+</section>
+<section class="Sh">
+<h1 class="Sh" id="SEE_ALSO"><a class="permalink" href="#SEE_ALSO">SEE
   ALSO</a></h1>
-<a class="Xr" title="Xr">gold(1)</a>, <a class="Xr" title="Xr">ld(1)</a>,
-  <a class="Xr" title="Xr">ld.so(8)</a>
-<h1 class="Sh" title="Sh" id="AUTHORS"><a class="permalink" href="#AUTHORS">AUTHORS</a></h1>
-<span class="An" title="An">Rui Ueyama</span>
-  &lt;<a class="Mt" title="Mt" href="mailto:ruiu@cs.stanford.edu">ruiu@cs.stanford.edu</a>&gt;
-<h1 class="Sh" title="Sh" id="BUGS"><a class="permalink" href="#BUGS">BUGS</a></h1>
-Report bugs to
-  <a class="Lk" title="Lk" href="https://github.com/rui314/mold/issues">https://github.com/rui314/mold/issues</a>.</div>
+<p class="Pp"><a class="Xr">gold(1)</a>, <a class="Xr">ld(1)</a>,
+    <a class="Xr">elf(5)</a> <a class="Xr">ld.so(8)</a></p>
+</section>
+<section class="Sh">
+<h1 class="Sh" id="AUTHORS"><a class="permalink" href="#AUTHORS">AUTHORS</a></h1>
+<p class="Pp"><span class="An">Rui Ueyama</span>
+    &lt;<a class="Mt" href="mailto:ruiu@cs.stanford.edu">ruiu@cs.stanford.edu</a>&gt;</p>
+</section>
+<section class="Sh">
+<h1 class="Sh" id="BUGS"><a class="permalink" href="#BUGS">BUGS</a></h1>
+<p class="Pp">Report bugs to
+    <a class="Lk" href="https://github.com/rui314/mold/issues">https://github.com/rui314/mold/issues</a>.</p>
+</section>
+</div>
 <table class="foot">
   <tr>
-    <td class="foot-date">January 22, 2022</td>
-    <td class="foot-os">Debian</td>
+    <td class="foot-date">August 14, 2022</td>
+    <td class="foot-os">macOS 12.5</td>
   </tr>
 </table>
 </body>

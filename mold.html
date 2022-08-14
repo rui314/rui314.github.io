@@ -671,7 +671,7 @@
         ChromeOS, Android and Fuchsia support it as of now in 2022.</p>
     <p class="Pp"></p>
   </dd>
-  <dt>-package-metadata=string</dt>
+  <dt id="package-metadata"><a class="permalink" href="#package-metadata"><code class="Fl">--package-metadata</code></a>=<var class="Ar">string</var></dt>
   <dd>Embed <var class="Ar">string</var> to a .note.package section. This option
       in intended to be used by a package management command such as
       <code class="Cm">rpm</code> to embed metadata regarding a package to each
@@ -954,21 +954,8 @@
   </dd>
   <dt id="z~6"><a class="permalink" href="#z~6"><code class="Fl">-z</code></a>
     <code class="Cm">ibtplt</code></dt>
-  <dd>Generate Intel Branch Tracking (IBT)-enabled PLT.
-    <p class="Pp">IBT is part of Intel Control-flow Enforcement Technology
-        (CET). IBT is a new x86 feature available since Tiger Lake which is
-        released in 2020. If IBT is enabled, all indirect branch instructions
-        have to branch to a so-called &quot;landing pad&quot; instruction.
-        Landing pad itself is a no-op, but it works as a marker that branching
-        to that instruction is expected. If there's no landing pad after branch,
-        the CPU raises an exception. This mechanism makes ROP attacks
-      difficult.</p>
-    <p class="Pp">Since PLT can be used as an indirect branch target, we need a
-        different instruction sequence for IBT-enabled PLT. If
-        <b class="Sy">-z</b> <code class="Cm">ibtplt</code> is specified,
-        <code class="Nm">mold</code> generates PLT entries that start with a
-        landing pad. The size of IBT-enabled PLT is 24 bytes as opposed to 16
-        bytes regular PLT.</p>
+  <dd>Generate Intel Branch Tracking (IBT)-enabled PLT which is the default on
+      x86-64.
     <p class="Pp"></p>
   </dd>
   <dt id="z~7"><a class="permalink" href="#z~7"><code class="Fl">-z</code></a>
@@ -1007,11 +994,10 @@
       mutated by anyone. As a security mitigation, it is preferred to make such
       segments read-only during program execution.
     <p class="Pp"><code class="Fl">-z</code> <code class="Cm">relro</code> puts
-        such sections into a special section called
+        such sections into a special segment called
         <code class="Dv">relro</code>. The dynamic linker make a relro segment
         read-only after it finishes its job.</p>
-    <p class="Pp" id="relro">By default, <code class="Nm">mold</code> generates
-        a <a class="permalink" href="#relro"><b class="Sy">relro</b></a>
+    <p class="Pp">By default, <code class="Nm">mold</code> generates a relro
         segment. <code class="Fl">-z</code> <code class="Cm">norelro</code>
         disables the feature.</p>
     <p class="Pp"></p>
